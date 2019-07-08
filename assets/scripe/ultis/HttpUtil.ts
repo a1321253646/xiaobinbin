@@ -4,12 +4,15 @@ import MapBuilderInfo from '../bean/MapBuilderInfo'
 import BuilderJsonInfo from '../bean/BuilderJsonInfo'
 import BuilderStatusBean from '../bean/BuilderStatusBean'
 import RequiteChangeBuilder from '../bean/RequiteChangeBuilder'
+import RequiteZichang from '../bean/RequiteZichang'
 import RequiteCost from '../bean/RequiteCost'
+import RequiteWxUserInfo from '../bean/RequiteWxUserInfo'
 import RequiteAddMoney from '../bean/RequiteAddMoney'
 import MapInfo from '../bean/MapInfo'
 import GameControl from '../uiControl/GameControl'
 import RequiteMapInfoBean from '../bean/RequiteMapInfoBean'
 import HaveMapInfo from '../bean/HaveMapInfo'
+import RequiteReplaceId from '../bean/RequiteReplaceId'
 @ccclass
 export default class HttpUtil {
 	private static baseUrl: string = "http://120.79.249.55:9020/";
@@ -64,7 +67,7 @@ export default class HttpUtil {
 						current.level = data5["level"];
 						current.level_up_cost = Number(data5["level_up_cost"]);
 						current.creatBase = Number(data5["creatBase"]);
-						current.icon = data5["icon"];
+						current.icon = data5["resid"];
 						current.skill = data5["skill"];
 						current.param = data5["param"];
 						levelMap.set(current.level, current);
@@ -99,7 +102,7 @@ export default class HttpUtil {
 
 						cl.creatBase = Number(data7["creatBase"]);
 
-						cl.icon = data7["icon"];
+						cl.icon = data7["resid"];
 
 						cl.skill = data7["skill"];
 
@@ -107,6 +110,35 @@ export default class HttpUtil {
 
 						levelMap.set(cl.level, cl);
 					}
+					var data8 = param2["resource"];
+					if (data8) {
+						var mpi = new MapBuilderInfo();
+
+						mpi.id = data8["id"];
+
+
+						mpi.position = data8["position"];
+
+						mpi.name = data8["name"];
+
+						mpi.creattime = data8["creattime"];
+
+						mpi.size = data8["size"];
+						mpi.icon = data8["icon"];
+						console.log("BuilderControl  mpi.id   = " + mpi.id);
+						console.log("BuilderControl  mpi.position   = " + mpi.position);
+						console.log("BuilderControl  mpi.name   = " + mpi.name);
+						console.log("BuilderControl  mpi.creattime   = " + mpi.creattime);
+						console.log("BuilderControl  mpi.size   = " + mpi.size);
+						console.log("BuilderControl  mpi.icon   = " + mpi.icon);
+						var userBuild = target.mUserInfo.mapBuilderInfo;
+						if (userBuild.has(mpi.id)) {
+							userBuild.delete(mpi.id);
+						}
+						target.mUserInfo.mapBuilderInfo.set(mpi.id, mpi);
+
+					}
+
 
 					if (levelMap.size > 0) {
 						if (id != 0 && target.mUserInfo.mapBuilderLevelInfo.get(id) != null) {
@@ -154,7 +186,7 @@ export default class HttpUtil {
 		console.log("post json =" + js);
 		xhr.send(js);
 	}
-	public static addZichang(url, parame: RequiteAddMoney) {
+	public static addZichang(url, parame: RequiteZichang) {
 		url = HttpUtil.baseUrl + url;
 		var xhr = cc.loader.getXMLHttpRequest();
 		xhr.open("POST", url, true);
@@ -181,7 +213,68 @@ export default class HttpUtil {
 		xhr.send(js);
 
 	}
+	private static replaceUserId(url, old: string, newid: string) {
+		var req = new RequiteReplaceId();
+		req.newId = newid;
+		req.old = old;
 
+		url = HttpUtil.baseUrl + url;
+		var xhr = cc.loader.getXMLHttpRequest();
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		xhr.onreadystatechange = function () {
+			console.log("post xhr.readyState =" + xhr.readyState);
+			if (xhr.readyState === 4) {
+				let response = xhr.responseText;
+				console.log("post response =" + response);
+				if (xhr.status >= 200 && xhr.status < 300) {
+
+
+				} else {
+					//TODO
+				}
+			}
+		};
+		var js: string = JSON.stringify(req);
+		console.log("post json =" + js);
+		xhr.send(js);
+
+
+	}
+
+	public static postGetUserInfo(url, param: RequiteWxUserInfo , target: GameControl,isOld:boolean) {
+		url = HttpUtil.baseUrl + url;
+		var xhr = cc.loader.getXMLHttpRequest();
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		xhr.onreadystatechange = function () {
+			console.log("post xhr.readyState =" + xhr.readyState);
+			if (xhr.readyState === 4) {
+				let response = xhr.responseText;
+				console.log("post response =" + response);
+				if (xhr.status >= 200 && xhr.status < 300) {
+					let httpStatus = xhr.statusText;
+					var param2 = JSON.parse(response);
+					var userId = param2["openId"];
+					console.log("post userId =" + userId);
+					if (isOld) {
+						target.usrId = userId;
+						target.mUserInfo = new UserDateBean();
+						HttpUtil.postLocal("getuser", { user: userId }, target);
+					} else {
+						HttpUtil.replaceUserId("replace", target.usrId, userId);
+						target.usrId = userId;
+					}
+					
+				} else {
+					//TODO
+				}
+			}
+		};
+		var js: string = JSON.stringify(param);
+		console.log("post json =" + js);
+		xhr.send(js);
+	}
 
 	//Post请求用户数据
 	public static postLocal(url, param: object = {}, target: GameControl ) {
@@ -198,11 +291,21 @@ export default class HttpUtil {
 					let httpStatus = xhr.statusText;
 					var param2 = JSON.parse(response);
 					var userInfo = target.mUserInfo;
+					var user: string = param2["userId"];
+					console.log("post user =" + user);
+					console.log("post target.usrId =" + target.usrId);
+					if (user != target.usrId) {
+						console.log(" user !=target.usrId");
+						wx.setStorage({
+							key: "userId",
+							data: user
+						})
+					}
 					console.log("post param1 =" + param2);
 					userInfo.money = Number(param2["money"]);
 					userInfo.each_money = Number(param2["each_money"]);
-					userInfo.zichang = Number(param2["each_money"]);
-					userInfo.zuanshi = Number(param2["each_money"]);
+					userInfo.zichang = Number(param2["zichang"]);
+					userInfo.zuanshi = Number(param2["zuanshi"]);
 					userInfo.current_map = param2["current_map"];
 					userInfo.leave_time = param2["leave_time"];
 					userInfo.history = param2["history"];
@@ -218,7 +321,7 @@ export default class HttpUtil {
 							bsb.money_pre = data10[i]["money_pre"];
 							bsb.eachmoney = Number(data10[i]["eachmoney"]);
 							bsb.lastime = data10[i]["lastime"];
-							bsb.auto = 1;//data10[i]["auto"];
+							bsb.auto = data10[i]["isAuto"];
 							userInfo.mapBuilderStatus.set(bsb.id, bsb);
 						}
 					}
@@ -234,32 +337,13 @@ export default class HttpUtil {
 								map.name = data2[i]["name"];
 								map.id = data2[i]["id"];
 								map.salecd = data2[i]["salecd"];
-								map.bg = "Bg";//data2[i]["bg"];
+								map.bg = data2[i]["bg"];
+								map.builde_id = data2[i]["builde_id"];
 								userInfo.mapInfo.set(map.id, map);
 							}
 						}
 						console.log(" allMapInfo  " );
-						var data3 = data["weizhiList"];
-						if (data3) {
-							var len3 = data3.length;
-							for (var i = 0; i < len3; i++) {
-								var mpi = new MapBuilderInfo();
 
-								mpi.id = data3[i]["id"];
-								
-								mpi.localid = data3[i]["localid"];
-								
-								mpi.position = data3[i]["position"];
-								
-								mpi.name = data3[i]["name"];
-								
-								mpi.creattime = data3[i]["creattime"];
-								
-								mpi.builderId = data3[i]["builderId"];
-								
-								userInfo.mapBuilderInfo.set(mpi.builderId, mpi);
-							}
-						}
 						console.log(" weizhiList  ");
 						var data41 = data["builderInfoList"];
 						if (data41) {
@@ -276,7 +360,7 @@ export default class HttpUtil {
 									current.level = data5["level"];
 									current.level_up_cost = Number(data5["level_up_cost"]);
 									current.creatBase = Number(data5["creatBase"]);
-									current.icon = data5["icon"];
+									current.icon = data5["resid"];
 									current.skill = data5["skill"];
 									current.param = data5["param"];
 									levelMap.set(current.level, current);
@@ -317,13 +401,39 @@ export default class HttpUtil {
 									
 									cl.creatBase = Number(data7["creatBase"]);
 									
-									cl.icon = data7["icon"];
+									cl.icon = data7["resid"];
 								
 									cl.skill = data7["skill"];
 									
 									cl.param = data7["param"];
 							
 									levelMap.set(cl.level, cl);
+								}
+								console.log(" builderInfoList  next");
+
+								var data8 = data41[ii]["resource"];
+								if (data8) {
+									var mpi = new MapBuilderInfo();
+
+									mpi.id = data8["id"];
+
+
+									mpi.position = data8["position"];
+
+									mpi.name = data8["name"];
+
+									mpi.creattime =data8["creattime"];
+
+									mpi.size = data8["size"];
+									mpi.icon = data8["icon"];
+									console.log("BuilderControl  mpi.id   = " + mpi.id);
+									console.log("BuilderControl  mpi.position   = " + mpi.position);
+									console.log("BuilderControl  mpi.name   = " + mpi.name);
+									console.log("BuilderControl  mpi.creattime   = " + mpi.creattime);
+									console.log("BuilderControl  mpi.size   = " + mpi.size);
+									console.log("BuilderControl  mpi.icon   = " + mpi.icon);
+									userInfo.mapBuilderInfo.set(mpi.id, mpi);
+									
 								}
 								console.log(" builderInfoList  next");
 							}

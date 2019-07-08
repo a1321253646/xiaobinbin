@@ -3,6 +3,8 @@ import BuilderStatusBean from '../bean/BuilderStatusBean';
 import BuilderUiControl from './BuilderUiControl';
 import BuilderJsonInfo from './BuilderUiControl';
 import GameControl from './GameControl';
+import CoinControl from './CoinControl';
+import NumberToString from '../ultis/NumberToString';
 @ccclass
 export default class NewClass extends cc.Component {
 
@@ -19,9 +21,10 @@ export default class NewClass extends cc.Component {
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
-
-    start () {
-		
+	mCointControl: CoinControl;
+	start() {
+		this.mCointControl = this.node.getComponentInChildren(CoinControl);
+		this.mCointControl.init(this);
     }
 
 
@@ -67,12 +70,13 @@ export default class NewClass extends cc.Component {
 		this.isEnable = false;;
 		this.isAdd = true;
 
-		this.coinIcon.node.on(cc.Node.EventType.TOUCH_START, this.gainMoney,this);
+		this.coinIcon.node.on(cc.Node.EventType.TOUCH_START, this.gainMoney, this);
+		
 		this.coinIcon.node.on(cc.Node.EventType.TOUCH_MOVE, this.gainMoney, this);
 		if (this.mBean == null) {
-			this.coinTx.string = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost + "";
+			this.coinTx.string = NumberToString.numberToString(this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost);
 		} else {
-			this.coinTx.string = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost + "";
+			this.coinTx.string = NumberToString.numberToString(this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost);
 		}
 		
 		
@@ -80,25 +84,41 @@ export default class NewClass extends cc.Component {
 	public setEnable() {
 		this.mBean = this.mGame.mUserInfo.mapBuilderStatus.get(this.mId);
 		this.isEnable = true;
-		this.mCreateTime = this.mBean.time_pre/10000 * this.mGame.mUserInfo.mapBuilderInfo.get(this.mId).creattime;
+		var icon = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).icon;
+		var info = this.mGame.mUserInfo.mapBuilderInfo.get(icon);
+		this.mCreateTime = this.mBean.time_pre / 10000 * info.creattime;
 		this.mCreateTime = this.mCreateTime / 1000;
 
 		this.mCreateMoney = this.mBean.money_pre / 10000 * this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase;
-
+		this.mCreateMoney = this.mCreateMoney >> 0;
 		if (this.mBean.eachmoney == 0) {
 			this.mBean.eachmoney = this.mCreateMoney * (60 / this.mCreateTime);
 			this.mBean.eachmoney = this.mBean.eachmoney >> 0;
 		}
-		if (this.mBean.lastime != 0) {
-			//TODO 计算出离线的前
-		}
 
 		this.prigressBar.node.setScale(1, 1);
 		this.coinIcon.node.setScale(0, 0);
+		if (this.mBean.lastime != 0) {
+			var date = new Date();
+			var time = date.getTime();
+			time = time - this.mBean.lastime;
+			if (time > this.mCreateTime) {
+				console.log("outline time = " + time);
+				console.log("outline  this.mCreateMoney = " + this.mCreateMoney);
+				console.log("outline  this.mCreateTime = " + this.mCreateTime);
+				this.mMoney = this.mCreateMoney * ((time / this.mCreateTime) >> 0);
+				console.log("outline time money = " + this.mMoney );
+				this.coinTx.string = NumberToString.numberToString(this.mMoney);
+				this.coinIcon.node.setScale(1, 1);
+				return;
+			}
+
+		}
+		this.coinTx.string = "";
 	}
 
 	levelUpDeal() {
-		this.gainMoney(null);
+	//	this.gainMoney(null);
 		this.mBean = this.mGame.mUserInfo.mapBuilderStatus.get(this.mId);
 		var json = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level);
 		if (json.skill != 0) {
@@ -119,7 +139,7 @@ export default class NewClass extends cc.Component {
 	}
 
 	update(dt) {
-		
+
 		if (!this.isInit || !this.isEnable) {
 			return;
 		}
@@ -131,9 +151,7 @@ export default class NewClass extends cc.Component {
 			this.mTime -= this.mCreateTime;
 			this.prigressBar.progress = 1;
 			this.addMoney();
-			//if (this.mMoney == 0) {
-				this.coinIcon.node.setScale(1, 1);
-			//	}
+			this.mCointControl.show();
 			if (this.mBean.auto != 1) {
 				this.isAdd = false;
 			}
@@ -145,27 +163,21 @@ export default class NewClass extends cc.Component {
 	}
 	private addMoney() {
 		this.mMoney += this.mCreateMoney ;
-		this.coinTx.string = this.mMoney + "";
+		this.coinTx.string = NumberToString.numberToString(this.mMoney);
 	}
 	public getMoney() {
 		return this.mMoney;
 	}
 
-
-	public gainMoney(event) {
-		if (!this.isEnable) {
-			this.mGame.enableBuilder(this.mId);
-			return;
-		}
+	public gainMoney() {
 		this.isAdd = true;
 		console.log("gainMoney");
 		this.isAdd = true;
 
 		this.mGame.gainMenoy(this.mId, this.mMoney);
-		
 		this.mMoney = 0;
-		this.coinTx.string = this.mMoney + "";
-		this.coinIcon.node.setScale(0, 0);
-		
+		this.coinTx.string =  "";
+		this.mCointControl.disShow();
+
 	}
 }

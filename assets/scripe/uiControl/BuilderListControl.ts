@@ -17,48 +17,57 @@ export default class NewClass extends cc.Component {
 	init(game: GameControl) {
 		console.log("BuilderListControl  init  ");
 		this.mGame = game;
-		this.mBuilderBeanList = this.mGame.mUserInfo.mapBuilderInfo;
-		console.log("BuilderListControl  this.mBuilderBeanList size = " + this.mBuilderBeanList.size);
-		var isInit = true;
 
-		if (this.mControlList.size > 0) {
-			this.mControlList.forEach((value, key) => {
-				value.unInit();
-			});
-		}
-		var noCreat = false;
-		this.mBuilderBeanList.forEach((value, key) => {
+		var currentMap = this.mGame.mUserInfo.current_map;
+		var builderList = this.mGame.mUserInfo.mapInfo.get(currentMap).builde_id;
+
+		var isInit = true;
+		var strs: string[] = builderList.split(",")
+		for (var i = 0; i < strs.length; i++) {
+			var builderid = Number(strs[i]);
 			var loadobj = null;
 			var control = null;
-			var info = value;
+			var keyTmp = 0;
 			if (this.mControlList.size > 0) {
-				this.mControlList.forEach((value, key) => {
-					if (value.mId == 0) {
-						loadobj = value.node;
-						control = value;
+
+				for (var ii = 0; ii < this.mControlList.keys.length; ii++) {
+					var key = this.mControlList.keys[ii];
+					console.log("BuilderListControl  init  key=" + key);
+					console.log("BuilderListControl  init  this.mControlList.get(key).mId=" + this.mControlList.get(key).mId);
+					if (this.mControlList.get(key).mId == 0) {
+						keyTmp = key;
+						loadobj = this.mControlList.get(key).node;
+						control = this.mControlList.get(key);
+						break;
 					}
-				});
+				}
 			}
 			if (loadobj == null) {
-				noCreat = true;
 				loadobj = cc.instantiate(this.myPrefab);
 				this.node.addChild(loadobj);
 				control = loadobj.getComponent(BuilderControl);
-				this.mControlList.set(info.builderId, control);
+				this.mControlList.set(builderid, control);
+			} else {
+				this.mControlList.delete(keyTmp);
+				this.mControlList.set(builderid, control);
 			}
-
-			var x = Number(info.position.split(",")[0]);
-			var y = Number(info.position.split(",")[1]);
-			console.log("BuilderListControl  info localid=" + info.localid + " x=" + x + " y=" + y);
-			loadobj.setPosition(cc.p(x, y));
-			
-			control.init(info.builderId, this.mGame, isInit);
-			if (this.mGame.mUserInfo.mapBuilderStatus.get(info.builderId) == null) {
+			if (this.mGame.mUserInfo.mapBuilderStatus.get(builderid) == null) {
 				isInit = false;
 			}
-		});
-	}
+			control.init(builderid, this.mGame, isInit);
+		}
 
+
+
+		
+	}
+	restart() {
+		if (this.mControlList.size > 0) {
+			this.mControlList.forEach((value, key) => {
+				value.restart();
+			});
+		}
+	}
 
 	showLoaded(id: number) {
 		this.mControlList.get(id).showLoaded();
@@ -70,17 +79,15 @@ export default class NewClass extends cc.Component {
 	}
 
 	enableBuilder(id: number) {
+		
 		var control = this.mControlList.get(id);
+
+		control.init(id, this.mGame, true);
+
 		control.enableBuilder();
-		var isHave = false;
-		this.mBuilderBeanList.forEach((value, key) => {
-			var info = value;
-			if (!isHave &&this.mGame.mUserInfo.mapBuilderStatus.get(info.builderId) == null) {
-				var control2 = this.mControlList.get(info.builderId);
-				control2.init(info.builderId, this.mGame, true);
-				isHave = true;
-			}			
-		});
+
+
+		
 
 	}
 	showLevelUp() {

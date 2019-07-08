@@ -3,6 +3,7 @@ import BuilderStatusBean from '../bean/BuilderStatusBean';
 import GameControl from '../uiControl/GameControl';
 import BuilderUiControl from './BuilderUiControl';
 import BuilderJsonInfo from './BuilderUiControl';
+import NumberToString from '../ultis/NumberToString';
 @ccclass
 export default class NewClass extends cc.Component {
 	@property(cc.ProgressBar)
@@ -83,8 +84,8 @@ export default class NewClass extends cc.Component {
 		console.log("this.mBean.level =" + this.mBean.level + " this.mMax = " + this.mMax);
 		this.prigressBar.node.setScale(1, 1);
 		this.prigressBar.progress = (this.mBean.level - this.mMin) / (this.mMax - this.mMin);
-		this.tx.string = this.mBean.level + "/" + this.mMax;
-		this.cost.string = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost+"";
+		this.tx.string ="Lv"+ this.mBean.level;
+		this.cost.string = NumberToString.numberToString(this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost );
 	}
 
 	touchStart(event) {
@@ -123,7 +124,10 @@ export default class NewClass extends cc.Component {
 		if (level > 0) {
 			this.mGame.levelup(this.mId, level, cost);
 			console.log("this.mBean.level + levell  =" + (this.mBean.level + level) +  " this.mMax=" + this.mMax);
-			if (this.mBean.level== this.mMax) {
+			if (this.mBean.level == this.mMax) {
+				this.icon.node.off(cc.Node.EventType.TOUCH_START);
+				this.icon.node.off(cc.Node.EventType.TOUCH_END);
+				this.isTouch = false;
 				this.mGame.showLoading(this.mId);
 			}
 		} else {
@@ -144,8 +148,8 @@ export default class NewClass extends cc.Component {
 		}
 		this.mBean = this.mGame.mUserInfo.mapBuilderStatus.get(this.mId);
 		this.prigressBar.progress = (this.mBean.level - this.mMin) / (this.mMax - this.mMin);
-		this.tx.string = this.mBean.level + "/" + this.mMax;
-		this.cost.string = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost + "";
+		this.tx.string = "Lv"+this.mBean.level ;
+		this.cost.string = NumberToString.numberToString(this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost);
 	}
 
    

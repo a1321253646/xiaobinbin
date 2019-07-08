@@ -2,6 +2,7 @@ const { ccclass, property } = cc._decorator;
 import GameControl from './GameControl';
 import HaveMapInfo from '../bean/HaveMapInfo';
 import RequiteAddMoney from '../bean/RequiteAddMoney';
+import RequiteZichang from '../bean/RequiteZichang';
 import RequitAddMoneyItem from '../bean/RequitAddMoneyItem';
 import HttpUtil from '../ultis/HttpUtil';
 @ccclass
@@ -46,30 +47,34 @@ export default class NewClass extends cc.Component {
 
 		this.mGame = cc.find("Canvas").getComponent(GameControl);
 		this.mCoint = 0;
-		this.mDeleteCoint = this.mGame.mUserInfo.money;
+		this.mDeleteCoint =0;
 		this.mDeleteBuilderCount = 0;
 		this.mDeleteDaojuCount = 0;
 		this.mZichang = 0;
 
 
 
-		if (this.mGame.mUserInfo.mapBuilderStatus.size != 0) {
-
-			this.mGame.mUserInfo.mapBuilderInfo.forEach((value, key) => {
-				var status = this.mGame.mUserInfo.mapBuilderStatus.get(value.builderId);
+/*		if (this.mGame.mUserInfo.mapBuilderStatus.size != 0) {
+			var list: String[] = this.mGame.mUserInfo.mapInfo.get(this.mGame.mUserInfo.current_map).builde_id.split(",");
+			for (var i = 0; i < list.length; i++) {
+				var key = Number(list[i]);
+				console.log(" this.mGame.mUserInfo.mapBuilderInfo key=  " + key);
+				var status = this.mGame.mUserInfo.mapBuilderStatus.get(key);
 				if (status != null) {
 					this.mDeleteBuilderCount++;
 					this.mCoint += status.allmoney;
 				}
-			});
+			}
 		}
+		console.log("this.mCoint=  " + this.mCoint);*/
 		var map = this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map)
 		var coin = map.creat - map.cost;
 		if (coin < 0) {
 			coin = 0;
 		}
-		this.mZichang = (this.mCoint * 0.01) >> 0;
-		this.mCoin.string = coin + "";
+		this.mDeleteCoint = coin;
+		this.mZichang = (map.creat * 0.01) >> 0;
+		this.mCoin.string = map.creat + "";
 		this.mDeleteBuilder.string = this.mDeleteBuilderCount + "";
 		this.mZiBen.string = this.mZichang + "";
 		this.mDeleteDaoju.string = this.mDeleteDaojuCount + "";
@@ -95,13 +100,11 @@ export default class NewClass extends cc.Component {
 
 	sure() {
 		this.mGame.showChange();
-		var req = new RequiteAddMoney();
-		req.user = "world";
-		var item = new RequitAddMoneyItem();
-		item.builderId = 0;
-		item.money = this.mZichang + "";
-		req.data.push(item);
-		HttpUtil.addZichang("req", req);
+		var req = new RequiteZichang();
+		req.user = this.mGame.usrId;
+		req.zichang = this.mZichang + "";
+		req.money = this.mDeleteCoint + "";
+		HttpUtil.addZichang("addzichang", req);
 	}
 	friend() {
 
