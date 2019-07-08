@@ -100,4 +100,10 @@ export default class NewClass extends cc.Component {
 		control.levelUpDeal();
 	}
 
+	changeUpCount(game: GameControl) {
+		this.mControlList.forEach((value, key) => {
+			value.changeUpCount(game);
+		});
+	}
+
 }

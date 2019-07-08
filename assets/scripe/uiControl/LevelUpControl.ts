@@ -44,7 +44,7 @@ export default class NewClass extends cc.Component {
 			this.mTime += dt;
 			if (this.mTime > 1) {
 				this.mTime -= 1;
-				this.levelup(this.mGame.levelUpCount);
+				this.levelup(this.mGame.levelUpCount,false);
 			}
 		}
 	}
@@ -91,7 +91,7 @@ export default class NewClass extends cc.Component {
 	touchStart(event) {
 		this.isTouch = true;
 		this.mTime = 0;
-		this.levelup(this.mGame.levelUpCount);
+		this.levelup(this.mGame.levelUpCount,true);
 	}
 	touchEnd(event) {
 		this.isTouch = false;
@@ -104,7 +104,7 @@ export default class NewClass extends cc.Component {
     start () {
 
 	}
-	levelup(count: number) {
+	levelup(count: number,isPlaySource:boolean) {
 		if (this.mBean.level + count > this.mMax) {
 			count = this.mMax - this.mBean.level;
 		}
@@ -114,7 +114,7 @@ export default class NewClass extends cc.Component {
 		for (var i = 0; i < count; i++) {
 			if (this.mGame.mUserInfo.money > this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost + cost) {
 				level++;
-				cost += this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost;		
+				cost += this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost;		
 			} else {
 				isAllUp = false;
 				break;
@@ -122,7 +122,7 @@ export default class NewClass extends cc.Component {
 		}
 		console.log("this.mBean.level  =" + this.mBean.level + " level=" + level + " this.mMax=" + this.mMax);
 		if (level > 0) {
-			this.mGame.levelup(this.mId, level, cost);
+			this.mGame.levelup(this.mId, level, cost, isPlaySource);
 			console.log("this.mBean.level + levell  =" + (this.mBean.level + level) +  " this.mMax=" + this.mMax);
 			if (this.mBean.level == this.mMax) {
 				this.icon.node.off(cc.Node.EventType.TOUCH_START);
@@ -148,9 +148,21 @@ export default class NewClass extends cc.Component {
 		}
 		this.mBean = this.mGame.mUserInfo.mapBuilderStatus.get(this.mId);
 		this.prigressBar.progress = (this.mBean.level - this.mMin) / (this.mMax - this.mMin);
-		this.tx.string = "Lv"+this.mBean.level ;
-		this.cost.string = NumberToString.numberToString(this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost);
+		this.tx.string = "Lv" + this.mBean.level;
+		this.changeUpCount(this.mGame);
+	//	this.cost.string = NumberToString.numberToString(this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost);
 	}
 
-   
+	changeUpCount(game: GameControl) {
+		var count = this.mMax - this.mMin;
+		var coat = 0;
+		console.log("game  =" + game);
+		if (game.levelUpCount < count) {
+			count = game.levelUpCount;
+		}
+		for (var i = 0; i < count; i++) {
+			coat += game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level+i).level_up_cost;
+		}
+		this.cost.string = NumberToString.numberToString(coat);
+	}
 }

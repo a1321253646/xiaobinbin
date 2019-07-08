@@ -294,13 +294,14 @@ export default class HttpUtil {
 					var user: string = param2["userId"];
 					console.log("post user =" + user);
 					console.log("post target.usrId =" + target.usrId);
-					if (user != target.usrId) {
+					/*if (user != target.usrId) {
 						console.log(" user !=target.usrId");
 						wx.setStorage({
 							key: "userId",
 							data: user
 						})
-					}
+					}*/
+					target.usrId = user;
 					console.log("post param1 =" + param2);
 					userInfo.money = Number(param2["money"]);
 					userInfo.each_money = Number(param2["each_money"]);

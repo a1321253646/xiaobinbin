@@ -50,6 +50,12 @@ export default class GameControl extends cc.Component {
 	@property(cc.Label)
 	mLevelUpCount: cc.Label = null;
 
+	@property(cc.AudioClip)
+	mCoinSource: cc.AudioClip = null;
+
+	@property(cc.AudioClip)
+	mLevelUpSource: cc.AudioClip = null;
+
 	mEanMoney = 0;
 
 	public mUserInfo: UserDateBean;
@@ -60,7 +66,7 @@ export default class GameControl extends cc.Component {
 	levelUpCount = 1;
 
 	start() {
-		let sysInfo = window.wx.getSystemInfoSync();
+	/*	let sysInfo = window.wx.getSystemInfoSync();
 		console.log("sysInfo.screenWidth=" + sysInfo.screenWidth);
 		console.log("sysInfo.screenHeight=" + sysInfo.screenHeight);
 
@@ -89,17 +95,6 @@ export default class GameControl extends cc.Component {
 									console.log("wx.getStrage error= " + e);
 								}
 
-								/*wx.getStorage({
-									key: 'userId',
-									success: function (res) {
-										console.log("wx.getStrage = " + res.data);
-										self.getUserInfo(self.usrId);
-									},
-									fail(error) {
-										console.log("wx.getStrage error= " + error);
-										self.getUserInfo(self.usrId);
-									}
-								});*/
 
 
 								let button = window.wx.createUserInfoButton({
@@ -169,10 +164,11 @@ export default class GameControl extends cc.Component {
 			fail: function () {
 				console.log('login fail')
 			}
-		})
-		//this.getUserInfo(this.usrId);
+		})*/
+		this.getUserInfo(this.usrId);
 		
 	}
+
 	usrId = "default";
 	getUserInfo(user2: string) {
 		this.usrId = user2;
@@ -253,6 +249,8 @@ export default class GameControl extends cc.Component {
 		req.data.push(item);
 		this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).creat += menoy;
 		HttpUtil.addMoney("addmoney", req);
+		cc.audioEngine.play(this.mCoinSource, false,1);
+
 	}
 
 	jianqian(menoy: number) {
@@ -266,7 +264,7 @@ export default class GameControl extends cc.Component {
 		HttpUtil.cost("cost", cost);
 	}
 
-	levelup(id: number, count: number,cost:number) {
+	levelup(id: number, count: number,cost:number,isPlaySource:boolean) {
 		var buidStatus = this.mUserInfo.mapBuilderStatus.get(id);
 		buidStatus.level = buidStatus.level + count;
 		this.node.getComponentInChildren(BuilderListControl).levelUpDeal(id);
@@ -286,6 +284,8 @@ export default class GameControl extends cc.Component {
 		req.date = req2;
 		HttpUtil.addBuilder("changebuilder", req);
 		this.jianqian(cost);
+		cc.audioEngine.play(this.mLevelUpSource, false,1);
+
 	}
 
 	enableBuilder(id: number) {
@@ -381,6 +381,7 @@ export default class GameControl extends cc.Component {
 			if (this.levelUpCount == 10) {
 				this.levelUpCount = 1;
 			}
+			this.node.getComponentInChildren(BuilderListControl).changeUpCount(this);
 			this.mLevelUpCount.string = "x" + this.levelUpCount;
 		}
 	}

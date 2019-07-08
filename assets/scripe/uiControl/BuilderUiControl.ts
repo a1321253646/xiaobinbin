@@ -147,6 +147,8 @@ export default class NewClass extends cc.Component {
 			}*/
 		}
 	}
-
+	changeUpCount(game: GameControl) {
+		this.mLevelUpControl.changeUpCount(game);
+	}
     // update (dt) {}
 }

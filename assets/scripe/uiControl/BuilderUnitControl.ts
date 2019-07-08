@@ -31,11 +31,11 @@ export default class NewClass extends cc.Component {
 		this.mId = id;;
 		this.mGame = game;;
 
-		if (this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost != 0) {
+		//if (this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost != 0) {
 			this.coinTx.string = NumberToString.numberToString(this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost );
-		} else {
-			this.coinTx.string = "";
-		}
+	//	} else {
+	//		this.coinTx.string = "";
+//		}
 		
 		this.node.getComponentInChildren(UinitCoinControl).init(this);
 	}

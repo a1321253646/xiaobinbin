@@ -122,4 +122,8 @@ export default class NewClass extends cc.Component {
 	levelUpDeal() {
 		this.mUi.levelUpDeal();
 	}
+
+	changeUpCount(game: GameControl) {
+		this.mUi.changeUpCount(game);
+	}
 }
