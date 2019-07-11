@@ -52,6 +52,7 @@ export default class NewClass extends cc.Component {
 	}
 
 	show() {
+		this.mCollider.enabled = true;
 		if (this.isShow) {
 			return;
 		}
@@ -61,7 +62,7 @@ export default class NewClass extends cc.Component {
 		this.isUping = true;
 		this.node.setScale(1, 1);
 		this.node.setPosition(this.mPoint);
-		this.mCollider.enabled = true;
+		
 		
 	}
 	disShow() {

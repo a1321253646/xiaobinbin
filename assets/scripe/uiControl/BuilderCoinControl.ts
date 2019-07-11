@@ -97,7 +97,13 @@ export default class NewClass extends cc.Component {
 		}
 
 		this.prigressBar.node.setScale(1, 1);
+
+		if (this.mCointControl == null) {
+			this.mCointControl = this.node.getComponentInChildren(CoinControl);
+			this.mCointControl.init(this);
+		}
 		this.coinIcon.node.setScale(0, 0);
+		this.mCointControl.disShow();
 		if (this.mBean.lastime != 0) {
 			var date = new Date();
 			var time = date.getTime();
@@ -109,7 +115,7 @@ export default class NewClass extends cc.Component {
 				this.mMoney = this.mCreateMoney * ((time / this.mCreateTime) >> 0);
 				console.log("outline time money = " + this.mMoney );
 				this.coinTx.string = NumberToString.numberToString(this.mMoney);
-				this.coinIcon.node.setScale(1, 1);
+				this.mCointControl.show();
 				return;
 			}
 

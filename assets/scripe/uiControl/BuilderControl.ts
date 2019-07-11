@@ -95,7 +95,6 @@ export default class NewClass extends cc.Component {
 		cc.loader.load("http://120.79.249.55/images/jianzhu/" + info.icon + ".png", function (err, texture) {
 			var sprite = new cc.SpriteFrame(texture);
 			self.mIcon.spriteFrame = sprite;
-
 		});
 
 	/*	cc.loader.loadRes("jianzhu/" + info.icon, cc.SpriteFrame, function (err, spriteFrame) {

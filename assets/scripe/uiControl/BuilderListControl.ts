@@ -23,21 +23,29 @@ export default class NewClass extends cc.Component {
 
 		var isInit = true;
 		var strs: string[] = builderList.split(",")
+		var childs = this.node.getComponentsInChildren(BuilderControl);
+		console.log("before childs.length =" + childs.length);
+		if (childs.length > 0) {
+			childs.forEach((value, key) => {
+				value.restart();
+			});
+		}
+		this.mControlList.clear();
 		for (var i = 0; i < strs.length; i++) {
 			var builderid = Number(strs[i]);
 			var loadobj = null;
 			var control = null;
 			var keyTmp = 0;
-			if (this.mControlList.size > 0) {
+			isInit = true;
+			if (childs.length > 0) {
 
-				for (var ii = 0; ii < this.mControlList.keys.length; ii++) {
+				for (var ii = 0; ii < childs.length; ii++) {
 					var key = this.mControlList.keys[ii];
-					console.log("BuilderListControl  init  key=" + key);
-					console.log("BuilderListControl  init  this.mControlList.get(key).mId=" + this.mControlList.get(key).mId);
-					if (this.mControlList.get(key).mId == 0) {
+					console.log("childs[i] =" + childs[ii].mId);
+					if (childs[ii].mId == 0) {
 						keyTmp = key;
-						loadobj = this.mControlList.get(key).node;
-						control = this.mControlList.get(key);
+						loadobj = childs[ii].node;
+						control = childs[ii];
 						break;
 					}
 				}
@@ -48,25 +56,34 @@ export default class NewClass extends cc.Component {
 				control = loadobj.getComponent(BuilderControl);
 				this.mControlList.set(builderid, control);
 			} else {
-				this.mControlList.delete(keyTmp);
+				//this.mControlList.delete(keyTmp);
 				this.mControlList.set(builderid, control);
 			}
+			console.log("builderid =" + builderid);
 			if (this.mGame.mUserInfo.mapBuilderStatus.get(builderid) == null) {
+				this.mGame.mUserInfo.mapBuilderStatus.forEach((value, key)=>{
+					console.log("foreach  =" + key);
+				});
+
+
 				isInit = false;
 			}
+			console.log("isInit =" + isInit);
 			control.init(builderid, this.mGame, isInit);
 		}
-
+		var childs2 = this.node.getComponentsInChildren(BuilderControl);
+		console.log("before childs.length =" + childs2.length);
 
 
 		
 	}
 	restart() {
-		if (this.mControlList.size > 0) {
+	/*	if (this.mControlList.size > 0) {
 			this.mControlList.forEach((value, key) => {
 				value.restart();
+				value.mId = 0;
 			});
-		}
+		}*/
 	}
 
 	showLoaded(id: number) {

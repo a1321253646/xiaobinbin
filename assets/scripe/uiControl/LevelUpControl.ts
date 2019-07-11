@@ -112,6 +112,10 @@ export default class NewClass extends cc.Component {
 		var cost = 0;
 		var isAllUp = true;
 		for (var i = 0; i < count; i++) {
+			if (this.mBean.level + i > this.mMax) {
+				isAllUp = false;
+				break;
+			}
 			if (this.mGame.mUserInfo.money > this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost + cost) {
 				level++;
 				cost += this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost;		
@@ -161,6 +165,9 @@ export default class NewClass extends cc.Component {
 			count = game.levelUpCount;
 		}
 		for (var i = 0; i < count; i++) {
+			if (this.mBean.level + i > this.mMax) {
+				break;
+			}
 			coat += game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level+i).level_up_cost;
 		}
 		this.cost.string = NumberToString.numberToString(coat);

@@ -1,4 +1,4 @@
-const { ccclass, property } = cc._decorator;
+锘縞onst { ccclass, property } = cc._decorator;
 import GameControl from './GameControl';
 import HaveMapInfo from '../bean/HaveMapInfo';
 import RequiteAddMoney from '../bean/RequiteAddMoney';
@@ -52,6 +52,17 @@ export default class NewClass extends cc.Component {
 		this.mDeleteDaojuCount = 0;
 		this.mZichang = 0;
 
+		var list: String[] = this.mGame.mUserInfo.mapInfo.get(this.mGame.mUserInfo.current_map).builde_id.split(",");
+		for (var i = 0; i < list.length; i++) {
+			var key = Number(list[i]);
+			console.log(" this.mGame.mUserInfo.mapBuilderInfo key=  " + key);
+			var status = this.mGame.mUserInfo.mapBuilderStatus.get(key);
+			if (status != null) {
+				this.mDeleteBuilderCount++;
+//				this.mCoint += status.allmoney;
+			}
+		}
+
 
 
 /*		if (this.mGame.mUserInfo.mapBuilderStatus.size != 0) {
@@ -83,7 +94,7 @@ export default class NewClass extends cc.Component {
 		var time123 = new Date().getTime();
 		console.log(" time =  " + time123);
 		if (this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).time == 0) {
-			this.mWaiteTime.string = "现在可以出售资产";
+			this.mWaiteTime.string = "鐜板湪鍙互鍑哄敭璧勪骇";
 		}
 
 	}
@@ -104,7 +115,28 @@ export default class NewClass extends cc.Component {
 		req.user = this.mGame.usrId;
 		req.zichang = this.mZichang + "";
 		req.money = this.mDeleteCoint + "";
+
+		var unlock = this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).unlock == 1;
+		console.log("unlock =" + unlock);
+		if (!unlock) {
+			unlock = true;
+			var map = this.mGame.mUserInfo.mapInfo.get(this.mGame.mUserInfo.current_map);
+			var builders = map.builde_id.split(",");
+
+			for (var i = 0; i < builders.length; i++) {
+				var id = Number(builders[i]);
+				console.log("id =" + id);
+				if (this.mGame.mUserInfo.mapBuilderStatus.get(id) == null) {
+					unlock = false;
+					break;
+				}
+			}
+
+		}
+		console.log("unlock =" + unlock);
+		req.unlock = unlock ? 1 : 0;
 		HttpUtil.addZichang("addzichang", req);
+		this.close();
 	}
 	friend() {
 

@@ -13,6 +13,8 @@ import GameControl from '../uiControl/GameControl'
 import RequiteMapInfoBean from '../bean/RequiteMapInfoBean'
 import HaveMapInfo from '../bean/HaveMapInfo'
 import RequiteReplaceId from '../bean/RequiteReplaceId'
+import RequiteAddMap from '../bean/RequiteAddMap'
+import OtherSettingControl from '../uiControl/OtherSettingControl'
 @ccclass
 export default class HttpUtil {
 	private static baseUrl: string = "http://120.79.249.55:9020/";
@@ -125,6 +127,7 @@ export default class HttpUtil {
 
 						mpi.size = data8["size"];
 						mpi.icon = data8["icon"];
+			
 						console.log("BuilderControl  mpi.id   = " + mpi.id);
 						console.log("BuilderControl  mpi.position   = " + mpi.position);
 						console.log("BuilderControl  mpi.name   = " + mpi.name);
@@ -186,6 +189,20 @@ export default class HttpUtil {
 		console.log("post json =" + js);
 		xhr.send(js);
 	}
+	public static addMap(url, parame: RequiteAddMap) {
+		url = HttpUtil.baseUrl + url;
+		var xhr = cc.loader.getXMLHttpRequest();
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		xhr.onreadystatechange = function () {
+			var g = cc.find("Canvas").getComponent(GameControl);
+			g.reStart()
+		}
+		var js: string = JSON.stringify(parame);
+		console.log("post json =" + js);
+		xhr.send(js);
+	}
+
 	public static addZichang(url, parame: RequiteZichang) {
 		url = HttpUtil.baseUrl + url;
 		var xhr = cc.loader.getXMLHttpRequest();
@@ -256,6 +273,8 @@ export default class HttpUtil {
 					let httpStatus = xhr.statusText;
 					var param2 = JSON.parse(response);
 					var userId = param2["openId"];
+					var name = param2["nickName"];
+					var icon = param2["avatarUrl"];
 					console.log("post userId =" + userId);
 					if (isOld) {
 						target.usrId = userId;
@@ -265,7 +284,7 @@ export default class HttpUtil {
 						HttpUtil.replaceUserId("replace", target.usrId, userId);
 						target.usrId = userId;
 					}
-					
+					cc.find("Canvas").getComponentInChildren(OtherSettingControl).init(name, icon);
 				} else {
 					//TODO
 				}
@@ -338,6 +357,7 @@ export default class HttpUtil {
 								map.name = data2[i]["name"];
 								map.id = data2[i]["id"];
 								map.salecd = data2[i]["salecd"];
+								map.icon = data2[i]["icon"];
 								map.bg = data2[i]["bg"];
 								map.builde_id = data2[i]["builde_id"];
 								userInfo.mapInfo.set(map.id, map);
@@ -458,6 +478,8 @@ export default class HttpUtil {
 							haveMap.time = data300[i]["time"];
 							haveMap.creat = Number(data300[i]["creat"]);
 							haveMap.cost = Number(data300[i]["cost"]);
+							haveMap.unlock = data300[i]["unlock"];
+							haveMap.shopcount = data300[i]["shopcount"];
 							userInfo.mHaveMap.set(haveMap.id, haveMap);
 						}
 					}

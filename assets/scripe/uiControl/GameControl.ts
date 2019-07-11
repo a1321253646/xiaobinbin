@@ -1,17 +1,21 @@
-const { ccclass, property } = cc._decorator;
+ï»¿const { ccclass, property } = cc._decorator;
 import BuilderListControl from './BuilderListControl'
 import UserDateBean from '../bean/UserDateBean'
 import RequiteChangeBuilder from '../bean/RequiteChangeBuilder'
 import RequiteBuilderStatusBean from '../bean/RequiteBuilderStatusBean'
 import BuilderStatusBean from '../bean/BuilderStatusBean'
 import RequiteAddMoney from '../bean/RequiteAddMoney'
+import RequiteAddMap from '../bean/RequiteAddMap'
 import RequitAddMoneyItem from '../bean/RequitAddMoneyItem'
 import RequiteWxUserInfo from '../bean/RequiteWxUserInfo'
 import RequiteMapInfoBean from '../bean/RequiteMapInfoBean'
 import RequiteCost from '../bean/RequiteCost'
 import HttpUtil from '../ultis/HttpUtil'
 import SaleControl from './SaleControl'
+import MapItenListControl from './MapItenListControl'
+import OtherSettingControl from './OtherSettingControl'
 import NumberToString from '../ultis/NumberToString'
+import UnlockMapView from './UnlockMapView'
 @ccclass
 export default class GameControl extends cc.Component {
 	@property(cc.Label)
@@ -32,6 +36,8 @@ export default class GameControl extends cc.Component {
 	mBaoxiang: cc.Node = null;
 	@property(cc.Node)
 	mShopping: cc.Node = null;
+	@property(cc.Node)
+	mLevelUpTip: cc.Node = null;
 	@property(cc.Node)
 	mTouchLayout: cc.Node = null;
 
@@ -74,7 +80,7 @@ export default class GameControl extends cc.Component {
 		wx.login({
 			success: function (r) {
 				console.log('login success')
-				var code = r.code;//µÇÂ¼Æ¾Ö¤
+				var code = r.code;//ç™»å½•å‡­è¯
 				if (code) {
 					wx.getSetting({
 						success(res) {
@@ -105,7 +111,7 @@ export default class GameControl extends cc.Component {
 										top: 0,
 										width: sysInfo.screenWidth,
 										height: sysInfo.screenHeight,
-										backgroundColor: '#00000000',//×îºóÁ½Î»ÎªÍ¸Ã÷¶È
+										backgroundColor: '#00000000',//æœ€åŽä¸¤ä½ä¸ºé€æ˜Žåº¦
 										color: '#ffffff',
 										fontSize: 20,
 										textAlign: "center",
@@ -120,7 +126,7 @@ export default class GameControl extends cc.Component {
 										wx.getUserInfo({
 											success: function (res) {
 												console.log({ encryptedData: res.encryptedData, iv: res.iv, code: code })
-												//3.ÇëÇó×Ô¼ºµÄ·þÎñÆ÷£¬½âÃÜÓÃ»§ÐÅÏ¢ »ñÈ¡unionIdµÈ¼ÓÃÜÐÅÏ¢
+												//3.è¯·æ±‚è‡ªå·±çš„æœåŠ¡å™¨ï¼Œè§£å¯†ç”¨æˆ·ä¿¡æ¯ èŽ·å–unionIdç­‰åŠ å¯†ä¿¡æ¯
 												var user = new RequiteWxUserInfo();
 												user.encryptedData = res.encryptedData;
 												user.iv = res.iv;
@@ -129,7 +135,7 @@ export default class GameControl extends cc.Component {
 
 											},
 											fail: function () {
-												console.log('»ñÈ¡ÓÃ»§ÐÅÏ¢Ê§°Ü')
+												console.log('èŽ·å–ç”¨æˆ·ä¿¡æ¯å¤±è´¥')
 											}
 										})
 										button.destroy();
@@ -145,7 +151,7 @@ export default class GameControl extends cc.Component {
 								wx.getUserInfo({
 									success: function (res) {
 										console.log({ encryptedData: res.encryptedData, iv: res.iv, code: code })
-										//3.ÇëÇó×Ô¼ºµÄ·þÎñÆ÷£¬½âÃÜÓÃ»§ÐÅÏ¢ »ñÈ¡unionIdµÈ¼ÓÃÜÐÅÏ¢
+										//3.è¯·æ±‚è‡ªå·±çš„æœåŠ¡å™¨ï¼Œè§£å¯†ç”¨æˆ·ä¿¡æ¯ èŽ·å–unionIdç­‰åŠ å¯†ä¿¡æ¯
 										var user = new RequiteWxUserInfo();
 										user.encryptedData = res.encryptedData;
 										user.iv = res.iv;
@@ -153,7 +159,7 @@ export default class GameControl extends cc.Component {
 										HttpUtil.postGetUserInfo("wx", user, self,true);
 									},
 									fail: function () {
-										console.log('»ñÈ¡ÓÃ»§ÐÅÏ¢Ê§°Ü')
+										console.log('èŽ·å–ç”¨æˆ·ä¿¡æ¯å¤±è´¥')
 									}
 								})
 							}
@@ -164,12 +170,20 @@ export default class GameControl extends cc.Component {
 			fail: function () {
 				console.log('login fail')
 			}
-		})*/
+		})
+		*/
+		this.mBg1.node.on(cc.Node.EventType.TOUCH_START, this.back2Click, this);
 		this.getUserInfo(this.usrId);
 		
 	}
 
-	usrId = "default";
+	back2Click(event) {
+		this.node.getComponentInChildren(MapItenListControl).disShow();
+		this.node.getComponentInChildren(OtherSettingControl).disShow();
+	}
+
+	//usrId = "default";
+	usrId = "xXC5RbZkP";
 	getUserInfo(user2: string) {
 		this.usrId = user2;
 		this.mUserInfo = new UserDateBean();
@@ -227,9 +241,11 @@ export default class GameControl extends cc.Component {
 		this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money);
 		this.mEanMoney = 0;
 		this.mUserInfo.mapBuilderStatus.forEach((value, key) => {
+			console.log(" mapBuilderStatus.forEach key =  " + key + " value.eachmoney=" + value.eachmoney);
 			this.mEanMoney += value.eachmoney;
 		});
 		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney);
+		this.node.getComponentInChildren(MapItenListControl).init(this)
 		this.isLoading = true;
 	}
 
@@ -275,8 +291,7 @@ export default class GameControl extends cc.Component {
 		});
 		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney );
 
-
-
+		
 		var req = new RequiteChangeBuilder();
 		var req2 = new RequiteBuilderStatusBean();
 		req2.copy(buidStatus);
@@ -293,12 +308,12 @@ export default class GameControl extends cc.Component {
 		console.log(" this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost = " + this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost);
 	//	if (this.mUserInfo.money > 0) {
 			if (this.mUserInfo.money >= this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost) {
-				this.mUserInfo.money -= this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost;
+			//	this.mUserInfo.money -= this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost;
 				this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money );
 				this.jianqian(this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost)
 
 			} else {
-				//µ¯Ä»ÌáÊ¾Ç®²»¹»
+				//å¼¹å¹•æç¤ºé’±ä¸å¤Ÿ
 				return;
 			}
 //		}
@@ -314,13 +329,14 @@ export default class GameControl extends cc.Component {
 		buidStatus.auto = 1;
 		this.mUserInfo.mapBuilderStatus.set(id, buidStatus);
 
+
+		this.node.getComponentInChildren(BuilderListControl).enableBuilder(id);
 		var req = new RequiteChangeBuilder();
 		var req2 = new RequiteBuilderStatusBean();
 		req2.copy(buidStatus);
 		req.user = this.usrId;
 		req.date = req2;
 		HttpUtil.addBuilder("changebuilder", req);
-		this.node.getComponentInChildren(BuilderListControl).enableBuilder(id);
 		this.mEanMoney = 0;
 		this.mUserInfo.mapBuilderStatus.forEach((value, key) => {
 			this.mEanMoney += value.eachmoney;
@@ -357,6 +373,7 @@ export default class GameControl extends cc.Component {
 			this.mBaoxiang.setScale(1, 1);
 			this.mShopping.setScale(1, 1);
 			this.mLevelCount.setScale(0, 0);
+			this.mLevelUpTip.setScale(0, 0);
 		} else {
 			var self = this;
 			cc.loader.loadRes("levelup/close_lvup", cc.SpriteFrame, function (err, spriteFrame) {
@@ -367,6 +384,7 @@ export default class GameControl extends cc.Component {
 			this.mBaoxiang.setScale(0, 0);
 			this.mShopping.setScale(0, 0);
 			this.mLevelCount.setScale(1, 1	);
+			this.mLevelUpTip.setScale(1, 1	);
 
 			this.mLevelUpCount.string = "x" + this.levelUpCount;
 
@@ -389,6 +407,24 @@ export default class GameControl extends cc.Component {
 		this.node.getComponentInChildren(SaleControl).show();
 	}
 
+	openMap(id: number) {
+		if (id == this.mUserInfo.current_map) {
+			return;
+		}
+		var map = this.mUserInfo.mHaveMap.get(id);
+		if (map == null) {
+			console.log("lock id= " + id);
+			this.node.getComponentInChildren(UnlockMapView).show(this, id);
+			return;
+		}
+		console.log("open id= " + id);
+		var bean = new RequiteAddMap();
+		bean.user = this.usrId;
+		bean.cost = "0";
+		bean.mapid = id;
+		bean.isnew = 0;
+		HttpUtil.addMap("addmap", bean);
+	}
 	reStart() {
 		this.isInit = false;
 		this.isInited = false;

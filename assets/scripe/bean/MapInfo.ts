@@ -6,6 +6,7 @@ export default class MapInfo {
 	name = "default";
 	cost = 0;
 	salecd = 0;
+	icon = "default";
 	bg = "default";
 	builde_id = "";
 }

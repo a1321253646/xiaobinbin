@@ -6,5 +6,6 @@ export default class HaveMapInfo {
 	time = 0;
 	creat = 0;
 	cost = 0;
-
+	unlock = 0;
+	shopcount = 0;
 }
