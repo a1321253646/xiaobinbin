@@ -2,7 +2,12 @@
   "assets-sort-type": "name",
   "collision-matrix": [
     [
+      false,
       true
+    ],
+    [
+      true,
+      false
     ]
   ],
   "design-resolution-height": 640,
@@ -21,7 +26,8 @@
   "fit-height": true,
   "fit-width": false,
   "group-list": [
-    "default"
+    "object",
+    "touch"
   ],
   "last-module-event-record-time": 1562254287374,
   "simulator-orientation": false,
