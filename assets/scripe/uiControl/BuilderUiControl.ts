@@ -1,5 +1,6 @@
 const { ccclass, property } = cc._decorator;
 import BuilderStatusBean from '../bean/BuilderStatusBean';
+import ShopItemInfoBean from '../bean/ShopItemInfoBean';
 import BuilderCoinControl from './BuilderCoinControl';
 import LevelUpControl from './LevelUpControl';
 import BuilderControl from './BuilderControl';
@@ -150,5 +151,9 @@ export default class NewClass extends cc.Component {
 	changeUpCount(game: GameControl) {
 		this.mLevelUpControl.changeUpCount(game);
 	}
+	updateValue() {
+		this.mCoinControl.updateValue();
+	}
+
     // update (dt) {}
 }

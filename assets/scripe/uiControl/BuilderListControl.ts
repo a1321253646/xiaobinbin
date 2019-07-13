@@ -4,6 +4,7 @@ import MapBuilderInfo from '../bean/MapBuilderInfo'
 import BuilderBean from '../bean/BuilderBean';
 import BuilderStatusBean from '../bean/BuilderStatusBean';
 import BuilderControl from './BuilderControl';
+import ShopItemInfoBean from '../bean/ShopItemInfoBean';
 @ccclass
 export default class NewClass extends cc.Component {
 
@@ -24,6 +25,7 @@ export default class NewClass extends cc.Component {
 		var isInit = true;
 		var strs: string[] = builderList.split(",")
 		var childs = this.node.getComponentsInChildren(BuilderControl);
+
 		console.log("before childs.length =" + childs.length);
 		if (childs.length > 0) {
 			childs.forEach((value, key) => {
@@ -120,6 +122,11 @@ export default class NewClass extends cc.Component {
 	changeUpCount(game: GameControl) {
 		this.mControlList.forEach((value, key) => {
 			value.changeUpCount(game);
+		});
+	}
+	updateValue() {
+		this.mControlList.forEach((value, key) => {
+			value.updateValue();
 		});
 	}
 

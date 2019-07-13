@@ -2,6 +2,7 @@ const { ccclass, property } = cc._decorator;
 
 import BuilderStatusBean from '../bean/BuilderStatusBean';
 import BuilderBean from '../bean/BuilderBean';
+import ShopItemInfoBean from '../bean/ShopItemInfoBean';
 import MapBuilderInfo from '../bean/MapBuilderInfo';
 import BuilderUiControl from './BuilderUiControl';
 import BuilderListControl from './BuilderListControl';
@@ -125,4 +126,9 @@ export default class NewClass extends cc.Component {
 	changeUpCount(game: GameControl) {
 		this.mUi.changeUpCount(game);
 	}
+	updateValue() {
+		this.mUi.updateValue();
+	}
+
+
 }

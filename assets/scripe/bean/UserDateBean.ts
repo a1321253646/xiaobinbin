@@ -4,6 +4,7 @@ import MapBuilderInfo from "./MapBuilderInfo"
 import BuilderJsonInfo from "./BuilderJsonInfo"
 import BuilderStatusBean from "./BuilderStatusBean"
 import HaveMapInfo from "./HaveMapInfo"
+import ShopItemInfoBean from "./ShopItemInfoBean"
 @ccclass
 export default class UserDateBean {
 	money = 0;
@@ -19,5 +20,6 @@ export default class UserDateBean {
 	mapBuilderLevelInfo: Map<number, Map<number, BuilderJsonInfo>> = new Map<number, Map<number, BuilderJsonInfo>>();
 	mapBuilderStatus: Map<number, BuilderStatusBean> = new Map<number, BuilderStatusBean>();
 	mHaveMap: Map<number, HaveMapInfo> = new Map<number, HaveMapInfo>();
+	mShopItem: Map<number, ShopItemInfoBean> = new Map<number,ShopItemInfoBean>();
 
 }

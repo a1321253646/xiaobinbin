@@ -8,4 +8,6 @@ export default class HaveMapInfo {
 	cost = 0;
 	unlock = 0;
 	shopcount = 0;
+	buy = "";
+	zibenbeilv = 0;
 }

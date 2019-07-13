@@ -12,8 +12,10 @@ import MapInfo from '../bean/MapInfo'
 import GameControl from '../uiControl/GameControl'
 import RequiteMapInfoBean from '../bean/RequiteMapInfoBean'
 import HaveMapInfo from '../bean/HaveMapInfo'
-import RequiteReplaceId from '../bean/RequiteReplaceId'
+import RequiteBuyDaoju from '../bean/RequiteBuyDaoju'
 import RequiteAddMap from '../bean/RequiteAddMap'
+import ShopItemInfoBean from '../bean/ShopItemInfoBean'
+import RequiteReplaceId from '../bean/RequiteReplaceId'
 import OtherSettingControl from '../uiControl/OtherSettingControl'
 @ccclass
 export default class HttpUtil {
@@ -86,8 +88,8 @@ export default class HttpUtil {
 							cl.level_up_cost = Number(data6[iii]["level_up_cost"]);
 							cl.creatBase = Number(data6[iii]["creat_base"]);
 							cl.icon = current.icon;
-							cl.skill = current.skill;
-							cl.param = current.param;
+							cl.skill =0;
+							cl.param = 0;
 							levelMap.set(cl.level, cl);
 						}
 					}
@@ -112,6 +114,36 @@ export default class HttpUtil {
 
 						levelMap.set(cl.level, cl);
 					}
+
+					var data8 = param2["resource"];
+					if (data8) {
+						var len8 = data8.length;
+						for (var iiii = 0; iiii < len8; iiii++) {
+							var mpi = new MapBuilderInfo();
+							mpi.id = data8[iiii]["id"];
+
+							mpi.position = data8[iiii]["position"];
+
+							mpi.name = data8[iiii]["name"];
+
+							mpi.creattime = data8[iiii]["creattime"];
+
+							mpi.size = data8[iiii]["size"];
+							mpi.icon = data8[iiii]["icon"];
+							console.log("BuilderControl  mpi.id   = " + mpi.id);
+							console.log("BuilderControl  mpi.position   = " + mpi.position);
+							console.log("BuilderControl  mpi.name   = " + mpi.name);
+							console.log("BuilderControl  mpi.creattime   = " + mpi.creattime);
+							console.log("BuilderControl  mpi.size   = " + mpi.size);
+							console.log("BuilderControl  mpi.icon   = " + mpi.icon);
+							var userBuild = target.mUserInfo.mapBuilderInfo;
+							if (userBuild.has(mpi.id)) {
+								userBuild.delete(mpi.id);
+							}
+							target.mUserInfo.mapBuilderInfo.set(mpi.id, mpi);
+						}
+					}
+
 					var data8 = param2["resource"];
 					if (data8) {
 						var mpi = new MapBuilderInfo();
@@ -218,6 +250,19 @@ export default class HttpUtil {
 	}
 
 	public static cost(url, parame: RequiteCost) {
+		url = HttpUtil.baseUrl + url;
+		var xhr = cc.loader.getXMLHttpRequest();
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		xhr.onreadystatechange = function () {
+
+		}
+		var js: string = JSON.stringify(parame);
+		console.log("post json =" + js);
+		xhr.send(js);
+
+	}
+	public static buy(url, parame: RequiteBuyDaoju) {
 		url = HttpUtil.baseUrl + url;
 		var xhr = cc.loader.getXMLHttpRequest();
 		xhr.open("POST", url, true);
@@ -401,8 +446,8 @@ export default class HttpUtil {
 										cl.level_up_cost = Number(data6[iii]["level_up_cost"]);
 										cl.creatBase = Number(data6[iii]["creat_base"]);
 										cl.icon = current.icon;
-										cl.skill = current.skill;
-										cl.param = current.param;
+										cl.skill = 0;
+										cl.param = 0;
 										levelMap.set(cl.level, cl);
 									}
 
@@ -434,36 +479,32 @@ export default class HttpUtil {
 
 								var data8 = data41[ii]["resource"];
 								if (data8) {
-									var mpi = new MapBuilderInfo();
+									var len8 = data8.length;
+									for (var iiii = 0; iiii < len8; iiii++) {
+										var mpi = new MapBuilderInfo();
+										mpi.id = data8[iiii]["id"];
+							
+										mpi.position = data8[iiii]["position"];
 
-									mpi.id = data8["id"];
+										mpi.name = data8[iiii]["name"];
 
+										mpi.creattime = data8[iiii]["creattime"];
 
-									mpi.position = data8["position"];
-
-									mpi.name = data8["name"];
-
-									mpi.creattime =data8["creattime"];
-
-									mpi.size = data8["size"];
-									mpi.icon = data8["icon"];
-									console.log("BuilderControl  mpi.id   = " + mpi.id);
-									console.log("BuilderControl  mpi.position   = " + mpi.position);
-									console.log("BuilderControl  mpi.name   = " + mpi.name);
-									console.log("BuilderControl  mpi.creattime   = " + mpi.creattime);
-									console.log("BuilderControl  mpi.size   = " + mpi.size);
-									console.log("BuilderControl  mpi.icon   = " + mpi.icon);
-									userInfo.mapBuilderInfo.set(mpi.id, mpi);
-									
+										mpi.size = data8[iiii]["size"];
+										mpi.icon = data8[iiii]["icon"];
+										console.log("BuilderControl  mpi.id   = " + mpi.id);
+										console.log("BuilderControl  mpi.position   = " + mpi.position);
+										console.log("BuilderControl  mpi.name   = " + mpi.name);
+										console.log("BuilderControl  mpi.creattime   = " + mpi.creattime);
+										console.log("BuilderControl  mpi.size   = " + mpi.size);
+										console.log("BuilderControl  mpi.icon   = " + mpi.icon);
+										if (!userInfo.mapBuilderInfo.has(mpi.id)) {
+											userInfo.mapBuilderInfo.set(mpi.id, mpi)
+										}
+									}									
 								}
 								console.log(" builderInfoList  next");
 							}
-
-
-
-
-
-
 						}
 						console.log(" builderInfoList  ");
 
@@ -480,7 +521,26 @@ export default class HttpUtil {
 							haveMap.cost = Number(data300[i]["cost"]);
 							haveMap.unlock = data300[i]["unlock"];
 							haveMap.shopcount = data300[i]["shopcount"];
+							haveMap.buy = data300[i]["buy"];
+							haveMap.zibenbeilv = data300[i]["zibenbeilv"];
 							userInfo.mHaveMap.set(haveMap.id, haveMap);
+						}
+					}
+					console.log(" mMapHave  ");
+
+					var data400 = param2["shop"];
+					if (data400) {
+						var len400 = data400.length;
+						for (var i = 0; i < len400; i++) {
+							var shop = new ShopItemInfoBean();
+							shop.id = data400[i]["id"];
+							shop.costtype = data400[i]["costtype"];
+							shop.dealtype = data400[i]["dealtype"];
+							shop.parame = Number(data400[i]["parame"]);
+							shop.cost = Number(data400[i]["cost"]);
+							shop.icon = data400[i]["icon"];
+							shop.desc = data400[i]["desc"];
+							userInfo.mShopItem.set(shop.id, shop);
 						}
 					}
 

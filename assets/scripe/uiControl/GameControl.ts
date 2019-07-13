@@ -6,16 +6,19 @@ import RequiteBuilderStatusBean from '../bean/RequiteBuilderStatusBean'
 import BuilderStatusBean from '../bean/BuilderStatusBean'
 import RequiteAddMoney from '../bean/RequiteAddMoney'
 import RequiteAddMap from '../bean/RequiteAddMap'
+import ShopItemInfoBean from '../bean/ShopItemInfoBean'
 import RequitAddMoneyItem from '../bean/RequitAddMoneyItem'
 import RequiteWxUserInfo from '../bean/RequiteWxUserInfo'
 import RequiteMapInfoBean from '../bean/RequiteMapInfoBean'
 import RequiteCost from '../bean/RequiteCost'
+import RequiteBuyDaoju from '../bean/RequiteBuyDaoju'
 import HttpUtil from '../ultis/HttpUtil'
 import SaleControl from './SaleControl'
 import MapItenListControl from './MapItenListControl'
 import OtherSettingControl from './OtherSettingControl'
 import NumberToString from '../ultis/NumberToString'
 import UnlockMapView from './UnlockMapView'
+import ShopControl from './ShopControl'
 @ccclass
 export default class GameControl extends cc.Component {
 	@property(cc.Label)
@@ -232,22 +235,73 @@ export default class GameControl extends cc.Component {
 			console.log(" maps[1] = " + maps[1]);
 		});
 		console.log("this.isLoadingCoun= " + this.isLoadingCount);
-		
+
+		var buystr = this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).buy;
+		console.log("buystr= " + buystr);
+		this.mMapTimePre = 10000;
+		this.mMapMoneyPre = 10000;
+		this.mMapZichang = 0;
+		if (buystr != null && buystr.length > 0) {
+			var buyList = buystr.split(",");
+			this.dealBeforeBuy(buyList);
+		}
+
+
 		this.node.getComponentInChildren(BuilderListControl).init(this);
 		console.log(" builderInit  ");
-		this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money) ;
 		this.mZuanshi.string = NumberToString.numberToString(this.mUserInfo.zuanshi);
 		this.aZichang.string = NumberToString.numberToString(this.mUserInfo.zichang);
 		this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money);
-		this.mEanMoney = 0;
-		this.mUserInfo.mapBuilderStatus.forEach((value, key) => {
-			console.log(" mapBuilderStatus.forEach key =  " + key + " value.eachmoney=" + value.eachmoney);
-			this.mEanMoney += value.eachmoney;
-		});
+		this.getEachMoney();
 		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney);
 		this.node.getComponentInChildren(MapItenListControl).init(this)
 		this.isLoading = true;
+		this.initShop();
 	}
+
+	getEachMoney() {
+		this.mEanMoney = 0;
+		console.log("getEachMoney " );
+		this.mUserInfo.mapBuilderStatus.forEach((value, key) => {
+			this.mEanMoney += value.eachmoney;
+			console.log("getEachMoney value.eachmoney = " + value.eachmoney);
+		});
+	}
+
+
+	mMapTimePre = 10000;
+	mMapMoneyPre = 10000;
+	mMapZichang = 0;
+	dealBeforeBuy(buyList: string[]) {
+		this.mMapTimePre = 10000;
+		this.mMapMoneyPre = 10000;
+		this.mMapZichang = 0;
+		this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).zibenbeilv = 0;
+		buyList.forEach((value, index) => {
+			console.log("dealBeforeBuy value = " + value);
+			var buy = Number(value);
+			var buybean = this.mUserInfo.mShopItem.get(buy);
+			if (buybean.dealtype == 1) {
+				var id = buybean.parame;
+				this.mUserInfo.mapBuilderStatus.get(id).auto = 1;
+			} else if (buybean.dealtype == 2) {
+				var builderList = this.mUserInfo.mapInfo.get(this.mUserInfo.current_map).builde_id.split(",");
+				this.mMapTimePre = (this.mMapTimePre * (1 - buybean.parame / 10000)) >> 0;
+				console.log("dealBeforeBuy this.mMapTimePre = " + this.mMapTimePre);
+			} else if (buybean.dealtype == 3) {
+				this.mMapZichang += buybean.parame;
+				console.log("dealBeforeBuy this.mMapZichang = " + this.mMapZichang);
+			} else if (buybean.dealtype == 4) {
+				console.log("dealBeforeBuy this.mMapMoneyPre = " + buybean.parame);
+				this.mMapMoneyPre = (this.mMapMoneyPre * (1 + buybean.parame / 10000)) >> 0;
+				console.log("dealBeforeBuy this.mMapMoneyPre = " + this.mMapMoneyPre);
+			}
+			
+			
+			
+		});
+	}
+
 
 	gainMenoy(id: number, menoy: number) {
 		console.log("this.mUserInfo.money = " + this.mUserInfo.money);
@@ -285,10 +339,8 @@ export default class GameControl extends cc.Component {
 		buidStatus.level = buidStatus.level + count;
 		this.node.getComponentInChildren(BuilderListControl).levelUpDeal(id);
 
-		this.mEanMoney = 0;
-		this.mUserInfo.mapBuilderStatus.forEach((value, key) => {
-			this.mEanMoney += value.eachmoney;
-		});
+		
+		this.getEachMoney();
 		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney );
 
 		
@@ -301,6 +353,10 @@ export default class GameControl extends cc.Component {
 		this.jianqian(cost);
 		cc.audioEngine.play(this.mLevelUpSource, false,1);
 
+	}
+
+	initShop() {
+		this.node.getComponentInChildren(ShopControl).init(this);
 	}
 
 	enableBuilder(id: number) {
@@ -326,7 +382,7 @@ export default class GameControl extends cc.Component {
 		buidStatus.money_pre = 10000;
 		buidStatus.time_pre = 10000;
 		buidStatus.eachmoney = 0;
-		buidStatus.auto = 1;
+		buidStatus.auto = 0;
 		this.mUserInfo.mapBuilderStatus.set(id, buidStatus);
 
 
@@ -337,12 +393,9 @@ export default class GameControl extends cc.Component {
 		req.user = this.usrId;
 		req.date = req2;
 		HttpUtil.addBuilder("changebuilder", req);
-		this.mEanMoney = 0;
-		this.mUserInfo.mapBuilderStatus.forEach((value, key) => {
-			this.mEanMoney += value.eachmoney;
-		});
+		this.getEachMoney();
 		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney);
-
+		this.initShop();
 	}
 
 
@@ -407,6 +460,54 @@ export default class GameControl extends cc.Component {
 		this.node.getComponentInChildren(SaleControl).show();
 	}
 
+	buy(bean: ShopItemInfoBean): boolean{
+		if (bean.costtype == 1) {
+			if (this.mUserInfo.money < bean.parame) {
+				return false;
+			}
+			this.mUserInfo.money -= bean.parame;
+		} else if (bean.costtype == 2) {
+			if (this.mUserInfo.zichang < bean.parame) {
+				return false;
+			}
+			this.mUserInfo.zichang -= bean.parame;
+		}
+		var req = new RequiteBuyDaoju();
+		req.user = this.usrId;
+		req.costcount = bean.parame + "";
+		req.costtype = bean.costtype;
+		req.id = bean.id;
+		req.mapId = this.mUserInfo.current_map;
+		HttpUtil.buy("daoju", req);
+
+		if (bean.dealtype == 1) {
+			var id = bean.parame;
+			this.mUserInfo.mapBuilderStatus.get(id).auto = 1;
+		}else if (bean.dealtype == 2) {
+			//var builderList = this.mUserInfo.mapInfo.get(this.mUserInfo.current_map).builde_id.split(",");
+			this.mMapTimePre = (this.mMapTimePre * (1 - bean.parame / 10000)) >> 0;
+		} else if (bean.dealtype == 3) {
+			this.mMapZichang += bean.parame;
+		} else if (bean.dealtype == 4) {
+			this.mMapMoneyPre = (this.mMapMoneyPre * (bean.parame / 10000)) >> 0;
+		}
+		this.node.getComponentInChildren(BuilderListControl).updateValue();
+
+		this.aZichang.string = NumberToString.numberToString(this.mUserInfo.zichang);
+		this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money);
+		this.getEachMoney();
+		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney);
+		var buystr = this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).buy;
+		if (buystr != null && buystr.length > 0) {
+			buystr = buystr + "," + bean.id;
+		} else {
+			buystr = "" + bean.id;
+		}
+		this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).buy = buystr;
+		this.initShop();
+		return true;
+	}
+
 	openMap(id: number) {
 		if (id == this.mUserInfo.current_map) {
 			return;
@@ -423,6 +524,7 @@ export default class GameControl extends cc.Component {
 		bean.cost = "0";
 		bean.mapid = id;
 		bean.isnew = 0;
+	
 		HttpUtil.addMap("addmap", bean);
 	}
 	reStart() {
@@ -434,4 +536,17 @@ export default class GameControl extends cc.Component {
 	showChange() {
 		this.mLoading.node.setScale(1, 1);
 	}
+	isShowShop = false;
+	clickShop() {
+		if (this.isShowShop) {
+			this.isShowShop = false;
+			this.node.getComponentInChildren(ShopControl).disShow();
+		} else {
+			this.isShowShop = true;
+			this.node.getComponentInChildren(ShopControl).show();
+		}
+	}
+
+
+
 }

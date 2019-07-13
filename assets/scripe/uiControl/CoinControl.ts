@@ -47,7 +47,7 @@ export default class NewClass extends cc.Component {
 	start() {
 		this.mCollider = this.node.getComponent(cc.CircleCollider);
 		cc.director.getCollisionManager().enabled = true;
-		this.mCollider.enabled = false;
+	//	this.mCollider.enabled = false;
 		//cc.director.getCollisionManager().enabledDebugDraw = true;
 	}
 
