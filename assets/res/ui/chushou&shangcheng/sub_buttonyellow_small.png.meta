@@ -7,7 +7,7 @@
   "premultiplyAlpha": false,
   "subMetas": {
     "sub_buttonyellow_small": {
-      "ver": "1.0.4",
+      "ver": "1.0.3",
       "uuid": "1e7e7021-5b24-4abb-928c-340ac11d36ed",
       "rawTextureUuid": "199b18d9-271f-41bd-9bd3-b14f1359cc37",
       "trimType": "auto",
@@ -17,10 +17,10 @@
       "offsetY": 0,
       "trimX": 0,
       "trimY": 0,
-      "width": 106,
-      "height": 51,
-      "rawWidth": 106,
-      "rawHeight": 51,
+      "width": 110,
+      "height": 55,
+      "rawWidth": 110,
+      "rawHeight": 55,
       "borderTop": 0,
       "borderBottom": 0,
       "borderLeft": 0,
