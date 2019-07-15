@@ -67,7 +67,7 @@ export default class NewClass extends cc.Component {
 
 
 	getString(): string {
-		var back = "123123123";
+		//var back =;
 		/*if (this.mBean.desc.split("&n").length > 1) {
 			var b = this.mGame.mUserInfo.mapBuilderStatus.get(this.mBean.parame);
 			var level = 0;
@@ -84,7 +84,7 @@ export default class NewClass extends cc.Component {
 			b2 = Number(b2str);
 			back = this.mBean.desc.replace("&p", b2+"");
 		}*/
-		return back;
+		return "123123123";
 	}
 
 

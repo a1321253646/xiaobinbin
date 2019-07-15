@@ -53,8 +53,6 @@ export default class GameControl extends cc.Component {
 	@property(cc.Sprite)
 	mBg1: cc.Sprite = null;
 
-	@property(cc.Sprite)
-	mTest: cc.Sprite = null;
 
 	@property(cc.Sprite)
 	mLoading: cc.Sprite = null;
@@ -68,6 +66,12 @@ export default class GameControl extends cc.Component {
 	@property(cc.AudioClip)
 	mLevelUpSource: cc.AudioClip = null;
 
+	@property(cc.ProgressBar)
+	mLoadingBar: cc.ProgressBar = null;
+
+	@property(cc.Label)
+	mLoadingTx: cc.Label = null;
+
 	mEanMoney = 0;
 
 	public mUserInfo: UserDateBean;
@@ -78,7 +82,7 @@ export default class GameControl extends cc.Component {
 	levelUpCount = 1;
 
 	start() {
-	/*	let sysInfo = window.wx.getSystemInfoSync();
+		let sysInfo = window.wx.getSystemInfoSync();
 		console.log("sysInfo.screenWidth=" + sysInfo.screenWidth);
 		console.log("sysInfo.screenHeight=" + sysInfo.screenHeight);
 
@@ -176,10 +180,10 @@ export default class GameControl extends cc.Component {
 			fail: function () {
 				console.log('login fail')
 			}
-		})*/
+		})
 		
 		this.mBg1.node.on(cc.Node.EventType.TOUCH_START, this.back2Click, this);
-		this.getUserInfo(this.usrId);
+		//this.getUserInfo(this.usrId);
 		
 	}
 
@@ -188,8 +192,8 @@ export default class GameControl extends cc.Component {
 		this.node.getComponentInChildren(OtherSettingControl).disShow();
 	}
 
-	//usrId = "default";
-	usrId = "xXC5RbZkP";
+	usrId = "default";
+	//usrId = "xXC5RbZkP";
 	getUserInfo(user2: string) {
 		this.usrId = user2;
 		this.mUserInfo = new UserDateBean();
@@ -197,13 +201,37 @@ export default class GameControl extends cc.Component {
 	}
 	isLoading = false;
 	isLoadingCount = 0;
+	isLoadingCountMax = 0;
+
+	mLoadingTime = 0;
 	update(dt) {
 		if (!this.isInit) {
 			return;
 		}
-		if (this.isLoading && this.isLoadingCount == 0) {
-			this.isLoading = false;
-			this.mLoading.node.setScale(0, 0);
+
+
+
+		if (this.isLoading) {
+			this.mLoadingTime += dt;
+			if (this.mLoadingTime >= 3) {
+				this.mLoadingTime = 0;
+				this.mLoadingTx.string = "加载中."
+			} else if (this.mLoadingTime >= 2) {
+				this.mLoadingTx.string = "加载中..."
+			} else if (this.mLoadingTime >= 1) {
+				this.mLoadingTx.string = "加载中.."
+			} else if (this.mLoadingTime >= 2) {
+				this.mLoadingTx.string = "加载中."
+			}
+
+			if (this.isLoadingCount == 0) {
+				this.isLoading = false;
+				this.mLoading.node.setScale(0, 0);
+			} else {
+				this.mLoadingBar.progress = (this.isLoadingCountMax - this.isLoadingCount) / this.isLoadingCountMax;
+			}
+			
+
 		}
 
 		if (!this.isInited) {
@@ -213,7 +241,7 @@ export default class GameControl extends cc.Component {
 	}
 
 	builderInit() {
-		
+		this.mLoadingTime = 0;
 		var self = this;
 		console.log("this.mUserInfo.mapInfo.get(this.mUserInfo.current_map).bg= " + this.mUserInfo.mapInfo.get(this.mUserInfo.current_map).bg);
 		var maps: string[] = this.mUserInfo.mapInfo.get(this.mUserInfo.current_map).bg.split(",");
@@ -227,11 +255,6 @@ export default class GameControl extends cc.Component {
 			self.isLoadingCount--;
 			console.log("this.isLoadingCoun= " + self.isLoadingCount);
 			console.log(" maps[0] = " + maps[0] );
-		});
-
-		cc.loader.load("http://120.79.249.55/images/item_money_bg.png", function (err, texture) {
-			var sprite = new cc.SpriteFrame(texture);
-			self.mTest.spriteFrame = sprite;
 		});
 
 		console.log("this.isLoadingCoun= " + this.isLoadingCount);
@@ -266,6 +289,7 @@ export default class GameControl extends cc.Component {
 		this.node.getComponentInChildren(MapItenListControl).init(this)
 		this.isLoading = true;
 		this.initShop();
+		this.isLoadingCountMax = this.isLoadingCount;
 	}
 
 	getEachMoney() {
@@ -405,6 +429,10 @@ export default class GameControl extends cc.Component {
 		this.getEachMoney();
 		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney);
 		this.initShop();
+		if (id == 10002 && this.mUserInfo.zichang == 0) {
+			this.mUserInfo.zichang = 100;
+			this.aZichang.string = this.mUserInfo.zichang + "";
+		}
 	}
 
 
