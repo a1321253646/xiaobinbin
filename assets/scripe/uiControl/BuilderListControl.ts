@@ -36,7 +36,7 @@ export default class NewClass extends cc.Component {
 		for (var i = 0; i < strs.length; i++) {
 			var builderid = Number(strs[i]);
 			var loadobj = null;
-			var control = null;
+			var control: BuilderControl = null;
 			var keyTmp = 0;
 			isInit = true;
 			if (childs.length > 0) {
@@ -56,6 +56,7 @@ export default class NewClass extends cc.Component {
 				loadobj = cc.instantiate(this.myPrefab);
 				this.node.addChild(loadobj);
 				control = loadobj.getComponent(BuilderControl);
+				control.restart();
 				this.mControlList.set(builderid, control);
 			} else {
 				//this.mControlList.delete(keyTmp);
@@ -80,12 +81,11 @@ export default class NewClass extends cc.Component {
 		
 	}
 	restart() {
-	/*	if (this.mControlList.size > 0) {
+		if (this.mControlList.size > 0) {
 			this.mControlList.forEach((value, key) => {
 				value.restart();
-				value.mId = 0;
 			});
-		}*/
+		}
 	}
 
 	showLoaded(id: number) {

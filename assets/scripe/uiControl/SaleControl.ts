@@ -4,7 +4,9 @@ import HaveMapInfo from '../bean/HaveMapInfo';
 import RequiteAddMoney from '../bean/RequiteAddMoney';
 import RequiteZichang from '../bean/RequiteZichang';
 import RequitAddMoneyItem from '../bean/RequitAddMoneyItem';
+import ZichangToJinbinBean from '../bean/ZichangToJinbinBean';
 import HttpUtil from '../ultis/HttpUtil';
+import NumberToString from '../ultis/NumberToString';
 @ccclass
 export default class NewClass extends cc.Component {
 
@@ -84,12 +86,32 @@ export default class NewClass extends cc.Component {
 			coin = 0;
 		}
 		this.mDeleteCoint = coin;
-		this.mZichang = (map.creat * 0.01) >> 0;
-		this.mCoin.string = map.creat + "";
+		var buy = map.buy;
+		if (buy == null || buy.length == 0) {
+			this.mDeleteDaojuCount = 0;
+		} else {
+			this.mDeleteDaojuCount = buy.split(",").length;
+		}
+		var tmp1: number = 0;
+		this.mZichang = 0;
+		for (var i = 0; i < this.mGame.mUserInfo.mZichangToJingbin.length; i++) {
+			var jingbin = this.mGame.mUserInfo.mZichangToJingbin[i];
+
+			if (map.creat > jingbin.value) {
+				this.mZichang += ((jingbin.value - tmp1) / jingbin.beilv);
+				tmp1 = jingbin.value;
+			} else{
+				this.mZichang +=((map.creat - tmp1) / jingbin.beilv);
+				break;
+			}
+		}
+
+		this.mZichang = Math.round(this.mZichang);
+		this.mCoin.string = NumberToString.numberToString(map.creat );
 		this.mDeleteBuilder.string = this.mDeleteBuilderCount + "";
-		this.mZiBen.string = this.mZichang + "";
+		this.mZiBen.string = NumberToString.numberToString(this.mZichang);
 		this.mDeleteDaoju.string = this.mDeleteDaojuCount + "";
-		this.mDeleteCoin.string = this.mDeleteCoint + "";
+		this.mDeleteCoin.string = NumberToString.numberToString(this.mDeleteCoint); 
 		console.log(" this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).time =  " + this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).time);
 		var time123 = new Date().getTime();
 		console.log(" time =  " + time123);
@@ -98,7 +120,6 @@ export default class NewClass extends cc.Component {
 		}
 
 	}
-
 
 	start() {
 

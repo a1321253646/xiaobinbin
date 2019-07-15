@@ -23,11 +23,7 @@ export default class NewClass extends cc.Component {
 		
 		this.mGame = game;
 		this.mId = id;
-		if (this.mUi == null) {
-			this.mUi = this.node.getComponentInChildren(BuilderUiControl);
-
-		}
-		
+	
 		var level = 0;
 		if (this.mGame.mUserInfo.mapBuilderStatus != null) {
 			var status = this.mGame.mUserInfo.mapBuilderStatus.get(this.mId);
@@ -63,6 +59,8 @@ export default class NewClass extends cc.Component {
 		var l = Number(info.size.split(",")[1]);
 		this.node.setContentSize(w, l);
 
+		this.mUi.node.position = this.node.position;
+
 		this.mUi.node.setScale(1, 1);
 		this.node.setScale(1, 1);
 		
@@ -83,9 +81,13 @@ export default class NewClass extends cc.Component {
 		
 	}
 	restart() {
-		this.mUi.node.setScale(0, 0);
 		this.node.setScale(0,0);
 		this.mId = 0;
+		if (this.mUi == null) {
+			this.mUi = this.node.getComponentInChildren(BuilderUiControl);
+		}
+		this.mUi.restart();
+
 	}
 
 	showLoaded() {
@@ -113,7 +115,7 @@ export default class NewClass extends cc.Component {
 		this.mBean = this.mGame.mUserInfo.mapBuilderStatus.get(this.mId);
 		this.mIcon.setState(0);
 
-		this.mUi.setEnable();
+		this.mUi.init(this.mBean.id, this.mGame);
 
 	}
 	showLevelUp() {

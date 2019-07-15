@@ -54,6 +54,9 @@ export default class GameControl extends cc.Component {
 	mBg1: cc.Sprite = null;
 
 	@property(cc.Sprite)
+	mTest: cc.Sprite = null;
+
+	@property(cc.Sprite)
 	mLoading: cc.Sprite = null;
 
 	@property(cc.Label)
@@ -173,8 +176,8 @@ export default class GameControl extends cc.Component {
 			fail: function () {
 				console.log('login fail')
 			}
-		})
-		*/
+		})*/
+		
 		this.mBg1.node.on(cc.Node.EventType.TOUCH_START, this.back2Click, this);
 		this.getUserInfo(this.usrId);
 		
@@ -225,6 +228,12 @@ export default class GameControl extends cc.Component {
 			console.log("this.isLoadingCoun= " + self.isLoadingCount);
 			console.log(" maps[0] = " + maps[0] );
 		});
+
+		cc.loader.load("http://120.79.249.55/images/item_money_bg.png", function (err, texture) {
+			var sprite = new cc.SpriteFrame(texture);
+			self.mTest.spriteFrame = sprite;
+		});
+
 		console.log("this.isLoadingCoun= " + this.isLoadingCount);
 		this.isLoadingCount++;
 		cc.loader.load("http://120.79.249.55/images/map/" + maps[1] + ".png", function (err, texture) {
@@ -461,16 +470,20 @@ export default class GameControl extends cc.Component {
 	}
 
 	buy(bean: ShopItemInfoBean): boolean{
+		console.log(" bean.costtype   = " + bean.costtype);
+		console.log(" bean.parame   = " + bean.parame);
+		console.log(" this.mUserInfo.zichang   = " + this.mUserInfo.zichang);
+		console.log(" this.mUserInfo.money   = " + this.mUserInfo.money);
 		if (bean.costtype == 1) {
-			if (this.mUserInfo.money < bean.parame) {
+			if (this.mUserInfo.money < bean.cost) {
 				return false;
 			}
-			this.mUserInfo.money -= bean.parame;
+			this.mUserInfo.money -= bean.cost;
 		} else if (bean.costtype == 2) {
-			if (this.mUserInfo.zichang < bean.parame) {
+			if (this.mUserInfo.zichang < bean.cost) {
 				return false;
 			}
-			this.mUserInfo.zichang -= bean.parame;
+			this.mUserInfo.zichang -= bean.cost;
 		}
 		var req = new RequiteBuyDaoju();
 		req.user = this.usrId;

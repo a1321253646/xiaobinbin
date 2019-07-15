@@ -89,6 +89,7 @@ export default class NewClass extends cc.Component {
 
 
 	buy() {
+		console.log(" buy id   = " + this.mBean.id);
 		this.mGame.buy(this.mBean)
 	}
 	reset() {

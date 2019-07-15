@@ -16,6 +16,7 @@ import RequiteBuyDaoju from '../bean/RequiteBuyDaoju'
 import RequiteAddMap from '../bean/RequiteAddMap'
 import ShopItemInfoBean from '../bean/ShopItemInfoBean'
 import RequiteReplaceId from '../bean/RequiteReplaceId'
+import ZichangToJinbinBean from '../bean/ZichangToJinbinBean'
 import OtherSettingControl from '../uiControl/OtherSettingControl'
 @ccclass
 export default class HttpUtil {
@@ -374,6 +375,7 @@ export default class HttpUtil {
 					userInfo.current_map = param2["current_map"];
 					userInfo.leave_time = param2["leave_time"];
 					userInfo.history = param2["history"];
+					userInfo.net_time = param2["net_time"];
 					var data10 = param2["builders"];
 					if (data10) {
 						var len10 = data10.length;
@@ -543,6 +545,17 @@ export default class HttpUtil {
 							userInfo.mShopItem.set(shop.id, shop);
 						}
 					}
+					var data500 = param2["zichang_to_jingbin"];
+					if (data500) {
+						var len500 = data500.length;
+						for (var i = 0; i < len500; i++) {
+							var zj = new ZichangToJinbinBean();
+							zj.value = data500[i]["zichang"];
+							zj.beilv = data500[i]["jingbin"];
+							userInfo.mZichangToJingbin.push(zj);
+						}
+					}
+
 
 					target.isInit = true;
 				} else {

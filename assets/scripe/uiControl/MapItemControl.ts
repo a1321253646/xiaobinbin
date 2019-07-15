@@ -21,6 +21,13 @@ export default class MapItemControl extends cc.Component {
 			var sprite = new cc.SpriteFrame(texture);
 			self.icon.spriteFrame = sprite;
 		});
+		if (self.mGame.mUserInfo.current_map == self.mId) {
+			//self.icon.setState(1);
+			self.bt.interactable = false;
+		} else {
+			self.bt.interactable = true;
+		}
+
 	}
 
 	openMap() {

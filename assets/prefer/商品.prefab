@@ -30,7 +30,7 @@
       }
     ],
     "_active": true,
-    "_level": 1,
+    "_level": 4,
     "_components": [
       {
         "__id__": 27
@@ -797,9 +797,7 @@
     "_enabled": true,
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_spriteFrame": {
-      "__uuid__": "722abd21-294b-46ee-b022-4189a2bb7647"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_sizeMode": 0,
     "_fillType": 0,

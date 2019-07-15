@@ -102,15 +102,18 @@ export default class NewClass extends cc.Component {
 		}
 		this.coinIcon.node.setScale(0, 0);
 		this.mCointControl.disShow();
+		console.log("outline builderid=" + this.mId + " this.mBean.lastime = " + this.mBean.lastime);
 		if (this.mBean.lastime != 0) {
-			var date = new Date();
-			var time = date.getTime();
+			var time = this.mGame.mUserInfo.net_time;
 			console.log("outline time  date.getTime= " + time);
-			time = time - this.mBean.lastime;
+			
+			console.log("outline  this.mCreateMoney = " + this.mCreateMoney);
+			console.log("outline  this.mCreateTime = " + this.mCreateTime);
+
+			time = (time - this.mBean.lastime)/1000;
+			console.log("outline time = " + time);
 			if (time > this.mCreateTime) {
-				console.log("outline time = " + time);
-				console.log("outline  this.mCreateMoney = " + this.mCreateMoney);
-				console.log("outline  this.mCreateTime = " + this.mCreateTime);
+
 
 				var tmp = (time / this.mCreateTime + "").split(".");
 				if (this.mBean.auto == 1) {
@@ -127,6 +130,7 @@ export default class NewClass extends cc.Component {
 				this.mCointControl.show();
 				return;
 			} else {
+				this.mTime = time;
 				this.mCointControl.disShow();
 			}
 
@@ -181,7 +185,7 @@ export default class NewClass extends cc.Component {
 	}
 	private addMoney() {
 		this.mMoney += this.mCreateMoney;
-		console.log(" this.mMoney=" + this.mMoney);
+	//	console.log(" this.mMoney=" + this.mMoney);
 		this.coinTx.string = NumberToString.numberToString(this.mMoney);
 	}
 	public getMoney() {
@@ -201,53 +205,53 @@ export default class NewClass extends cc.Component {
 
 	}
 	updateValue() {
-		console.log("this.mGame = " + this.mGame);
+		//console.log("this.mGame = " + this.mGame);
 		if (this.mGame == null) {
 			return;
 		}
 
-		console.log("this.mGame.mUserInfo.zichang = " + this.mGame.mUserInfo.zichang);
-		console.log("this.mGame.mMapZichang = " + this.mGame.mMapZichang);
+		//console.log("this.mGame.mUserInfo.zichang = " + this.mGame.mUserInfo.zichang);
+		//console.log("this.mGame.mMapZichang = " + this.mGame.mMapZichang);
 		var beilv = this.mGame.mUserInfo.zichang * (0.2 +
 			this.mGame.mMapZichang / 10000);
-		console.log("beilv = " + beilv);
+		//console.log("beilv = " + beilv);
 		beilv = beilv + 1;
-		console.log("beilv = " + beilv);
+		//console.log("beilv = " + beilv);
 		var icon = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).icon;
 		var info = this.mGame.mUserInfo.mapBuilderInfo.get(icon);
-		console.log("info.creattime = " + info.creattime);
+		/*console.log("info.creattime = " + info.creattime);
 		console.log(" this.mBean.time_pre = " + this.mBean.time_pre);
-		console.log("this.mGame.mMapTimePre = " + this.mGame.mMapTimePre);
+		console.log("this.mGame.mMapTimePre = " + this.mGame.mMapTimePre);*/
 		this.mCreateTime = info.creattime * (this.mBean.time_pre / 10000) * (this.mGame.mMapTimePre / 10000); 
-		console.log("this.mCreateTime = " + this.mCreateTime);
+		//console.log("this.mCreateTime = " + this.mCreateTime);
 		this.mCreateTime = this.mCreateTime / 1000;
-		console.log("this.mCreateTime = " + this.mCreateTime);
+		//console.log("this.mCreateTime = " + this.mCreateTime);
 
 
-		console.log("this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase = " + this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase);
+	/*	console.log("this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase = " + this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase);
 		console.log("this.mBean.money_pre = " + this.mBean.money_pre);
 		console.log("this.mGame.mMapMoneyPre = " + this.mGame.mMapMoneyPre);
 		console.log("(this.mBean.money_pre / 10000) = " + (this.mBean.money_pre / 10000));
-		console.log("(this.mGame.mMapMoneyPre / 10000) = " + (this.mGame.mMapMoneyPre / 10000));
+		console.log("(this.mGame.mMapMoneyPre / 10000) = " + (this.mGame.mMapMoneyPre / 10000));*/
 
 
 		this.mCreateMoney = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase * (this.mBean.money_pre / 10000) * (this.mGame.mMapMoneyPre / 10000);
-		console.log("this.mCreateMoney = " + this.mCreateMoney);
+		//console.log("this.mCreateMoney = " + this.mCreateMoney);
 		this.mCreateMoney = this.mCreateMoney * beilv;
 		this.mCreateMoney = Math.round(this.mCreateMoney);
-		console.log("this.mCreateMoney = " + this.mCreateMoney);
+		//console.log("this.mCreateMoney = " + this.mCreateMoney);
 		this.mBean.eachmoney = this.mCreateMoney * (60 / this.mCreateTime);
-		console.log("this.mBean.eachmoney = " + this.mBean.eachmoney);
+		//console.log("this.mBean.eachmoney = " + this.mBean.eachmoney);
 		this.mBean.eachmoney = Math.round(this.mBean.eachmoney);
 		
-		console.log("this.mBean.eachmoney = " + this.mBean.eachmoney);
+		//console.log("this.mBean.eachmoney = " + this.mBean.eachmoney);
 		if (this.mBean.auto == 1 && !this.isAdd) {
 			this.isAdd = true;
 		}
 	}
 
 	dealJiacheng(type: number, param: number, bean: BuilderStatusBean) {
-		console.log("dealJiacheng");
+	//	console.log("dealJiacheng");
 		if (type == 4) {
 			bean.money_pre = (bean.money_pre * (param / 10000)) >> 0;
 		} else if (type == 2) {
