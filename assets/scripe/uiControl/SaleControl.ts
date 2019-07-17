@@ -156,6 +156,8 @@ export default class NewClass extends cc.Component {
 		}
 		console.log("unlock =" + unlock);
 		req.unlock = unlock ? 1 : 0;
+		req.isClean =1;
+		
 		HttpUtil.addZichang("addzichang", req);
 		this.close();
 	}

@@ -69,7 +69,6 @@ export default class HttpUtil {
 					var current = new BuilderJsonInfo();
 					if (data5) {
 						current.id = data5["id"];
-						current.name = data5["name"];
 						current.level = data5["level"];
 						current.level_up_cost = Number(data5["level_up_cost"]);
 						current.creatBase = Number(data5["creatBase"]);
@@ -85,7 +84,6 @@ export default class HttpUtil {
 						for (var iii = 0; iii < len6; iii++) {
 							var cl = new BuilderJsonInfo();
 							cl.id = current.id;
-							cl.name = current.name;
 							cl.level = data6[iii]["level"];
 							cl.level_up_cost = Number(data6[iii]["level_up_cost"]);
 							cl.creatBase = Number(data6[iii]["creat_base"]);
@@ -99,8 +97,6 @@ export default class HttpUtil {
 					if (data7) {
 						var cl = new BuilderJsonInfo();
 						cl.id = data7["id"];
-
-						cl.name = data7["name"];
 
 						cl.level = data7["level"];
 
@@ -360,6 +356,8 @@ export default class HttpUtil {
 					var user: string = param2["userId"];
 					console.log("post user =" + user);
 					console.log("post target.usrId =" + target.usrId);
+					//>>>>>>>>>>>>>>>>>>>>>>н╒пе
+	
 					if (user != target.usrId) {
 						console.log(" user !=target.usrId");
 						wx.setStorage({
@@ -367,6 +365,7 @@ export default class HttpUtil {
 							data: user
 						})
 					}
+					//<<<<<<<<<<<<<<<<<<<<<<<н╒пе
 					target.usrId = user;
 					console.log("post param1 =" + param2);
 					userInfo.money = Number(param2["money"]);
@@ -425,7 +424,6 @@ export default class HttpUtil {
 								var current = new BuilderJsonInfo();
 								if (data5) {
 									current.id = data5["id"];
-									current.name = data5["name"];
 									current.level = data5["level"];
 									current.level_up_cost = Number(data5["level_up_cost"]);
 									current.creatBase = Number(data5["creatBase"]);
@@ -444,7 +442,6 @@ export default class HttpUtil {
 									for (var iii = 0; iii < len6; iii++) {
 										var cl = new BuilderJsonInfo();
 										cl.id = current.id;
-										cl.name = current.name;
 										cl.level = data6[iii]["level"];
 										cl.level_up_cost = Number(data6[iii]["level_up_cost"]);
 										cl.creatBase = Number(data6[iii]["creat_base"]);
@@ -461,9 +458,7 @@ export default class HttpUtil {
 								if (data7) {
 									var cl = new BuilderJsonInfo();
 									cl.id = data7["id"];
-									
-									cl.name = data7["name"];
-									
+								
 									cl.level = data7["level"];
 									
 									cl.level_up_cost = Number(data7["level_up_cost"]);
@@ -557,8 +552,27 @@ export default class HttpUtil {
 						}
 					}
 
-
-					target.isInit = true;
+					cc.loader.loadRes("string.txt", function (err, data) {
+						if (err) {
+							console.log(err);
+							return;
+						}
+						if (target.mUserInfo == null) {
+							target.mUserInfo = new UserDateBean();
+						}
+						console.log("string.json= " + data);
+						var param = JSON.parse(data);
+						if (param) {
+							var len = param.length;
+							for (var i = 0; i < len; i++) {
+								var id = param[i]["ID"];
+								var value = param[i]["desc"];
+								target.mUserInfo.mString.set(id, value);
+							}
+						}
+						target.isInit = true;
+					});
+					
 				} else {
 					//TODO
 				}

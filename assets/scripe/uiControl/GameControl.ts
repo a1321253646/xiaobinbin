@@ -7,6 +7,7 @@ import BuilderStatusBean from '../bean/BuilderStatusBean'
 import RequiteAddMoney from '../bean/RequiteAddMoney'
 import RequiteAddMap from '../bean/RequiteAddMap'
 import ShopItemInfoBean from '../bean/ShopItemInfoBean'
+import RequiteZichang from '../bean/RequiteZichang'
 import RequitAddMoneyItem from '../bean/RequitAddMoneyItem'
 import RequiteWxUserInfo from '../bean/RequiteWxUserInfo'
 import RequiteMapInfoBean from '../bean/RequiteMapInfoBean'
@@ -19,6 +20,8 @@ import OtherSettingControl from './OtherSettingControl'
 import NumberToString from '../ultis/NumberToString'
 import UnlockMapView from './UnlockMapView'
 import ShopControl from './ShopControl'
+import FlyTextControl from './FlyTextControl'
+import FlyCoinControl from './FlyCoinControl'
 @ccclass
 export default class GameControl extends cc.Component {
 	@property(cc.Label)
@@ -72,6 +75,10 @@ export default class GameControl extends cc.Component {
 	@property(cc.Label)
 	mLoadingTx: cc.Label = null;
 
+	@property(cc.Prefab)
+	mFlyCoin: cc.Prefab = null;
+	@property(cc.Prefab)
+	mFlyText: cc.Prefab = null;
 	mEanMoney = 0;
 
 	public mUserInfo: UserDateBean;
@@ -82,6 +89,9 @@ export default class GameControl extends cc.Component {
 	levelUpCount = 1;
 
 	start() {
+
+
+		//>>>>>>>>>>>>>>>>>>>>>>微信
 		let sysInfo = window.wx.getSystemInfoSync();
 		console.log("sysInfo.screenWidth=" + sysInfo.screenWidth);
 		console.log("sysInfo.screenHeight=" + sysInfo.screenHeight);
@@ -181,22 +191,40 @@ export default class GameControl extends cc.Component {
 				console.log('login fail')
 			}
 		})
-		
-		this.mBg1.node.on(cc.Node.EventType.TOUCH_START, this.back2Click, this);
-		//this.getUserInfo(this.usrId);
-		
-	}
+	/*	wx.onShow(function (res) {
+			console.log("weixin onShow");
+			if (self.isAppShow) {
+				self.getUserInfo(self.usrId);
+			}
+			self.isAppShow = true;
+		})
 
+		wx.onHide(function (res) {
+			console.log("weixin onHide");
+		})*/
+		//<<<<<<<<<<<<<<<<<<<<<<<微信
+		this.mBg1.node.on(cc.Node.EventType.TOUCH_START, this.back2Click, this);
+		//>>>>>>>>>>>>>>>>>>>>>>>>>cocos
+		//this.getUserInfo(this.usrId);
+		//<<<<<<<<<<<<<<<<<<<<<<<cocos
+
+	}
+	isAppShow = false;
 	back2Click(event) {
 		this.node.getComponentInChildren(MapItenListControl).disShow();
 		this.node.getComponentInChildren(OtherSettingControl).disShow();
 	}
-
+	//>>>>>>>>>>>>>>>>>>>>>>微信
 	usrId = "default";
+	//<<<<<<<<<<<<<<<<<<<<<<<微信
+	//>>>>>>>>>>>>>>>>>>>>>>>>>cocos
 	//usrId = "xXC5RbZkP";
+	//<<<<<<<<<<<<<<<<<<<<<<<cocos
 	getUserInfo(user2: string) {
 		this.usrId = user2;
-		this.mUserInfo = new UserDateBean();
+	//	if (this.mUserInfo == null) {
+			this.mUserInfo = new UserDateBean();
+	//	} 
 		HttpUtil.postLocal("getuser", { user: user2 }, this);
 	}
 	isLoading = false;
@@ -283,9 +311,9 @@ export default class GameControl extends cc.Component {
 		console.log(" builderInit  ");
 		this.mZuanshi.string = NumberToString.numberToString(this.mUserInfo.zuanshi);
 		this.aZichang.string = NumberToString.numberToString(this.mUserInfo.zichang);
-		this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money);
+		this.changeAllMoneyCount();
 		this.getEachMoney();
-		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney);
+		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney)+"/s";
 		this.node.getComponentInChildren(MapItenListControl).init(this)
 		this.isLoading = true;
 		this.initShop();
@@ -336,29 +364,11 @@ export default class GameControl extends cc.Component {
 	}
 
 
-	gainMenoy(id: number, menoy: number) {
-		console.log("this.mUserInfo.money = " + this.mUserInfo.money);
-		console.log("menoy = " + menoy);
-		this.mUserInfo.money += menoy;
-		console.log("this.mUserInfo.money = " + this.mUserInfo.money);
-		this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money );
-		this.mUserInfo.mapBuilderStatus.get(id).allmoney = this.mUserInfo.mapBuilderStatus.get(id).allmoney + menoy;
-		this.mUserInfo.mapBuilderStatus.get(id).lastime = new Date().getTime();
-		var req = new RequiteAddMoney();
-		req.user = this.usrId;
-		var item = new RequitAddMoneyItem();
-		item.builderId = id;
-		item.money = menoy + "";
-		req.data.push(item);
-		this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).creat += menoy;
-		HttpUtil.addMoney("addmoney", req);
-		cc.audioEngine.play(this.mCoinSource, false,1);
 
-	}
 
 	jianqian(menoy: number) {
 		this.mUserInfo.money -= menoy;
-		this.allMeney.string = NumberToString.numberToString( this.mUserInfo.money );
+		this.changeAllMoneyCount();
 		var cost = new RequiteCost();
 		cost.user = this.usrId;
 		cost.type = 1;
@@ -374,7 +384,7 @@ export default class GameControl extends cc.Component {
 
 		
 		this.getEachMoney();
-		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney );
+		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney) + "/s";;
 
 		
 		var req = new RequiteChangeBuilder();
@@ -395,10 +405,9 @@ export default class GameControl extends cc.Component {
 	enableBuilder(id: number) {
 		console.log("this.mUserInfo.money = " + this.mUserInfo.money);
 		console.log(" this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost = " + this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost);
-	//	if (this.mUserInfo.money > 0) {
-			if (this.mUserInfo.money >= this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost) {
+		//	if (this.mUserInfo.money > 0) {
+		if (this.getAllMoney() >= this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost) {
 			//	this.mUserInfo.money -= this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost;
-				this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money );
 				this.jianqian(this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost)
 
 			} else {
@@ -427,11 +436,19 @@ export default class GameControl extends cc.Component {
 		req.date = req2;
 		HttpUtil.addBuilder("changebuilder", req);
 		this.getEachMoney();
-		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney);
+		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney) + "/s";;
 		this.initShop();
 		if (id == 10002 && this.mUserInfo.zichang == 0) {
 			this.mUserInfo.zichang = 100;
 			this.aZichang.string = this.mUserInfo.zichang + "";
+			var req3 = new RequiteZichang();
+			req3.user = this.usrId;
+			req3.zichang = 100 + "";
+			req3.money = "0";
+			req3.unlock = 0;
+			req3.isClean = 0;
+
+			HttpUtil.addZichang("addzichang", req3);
 		}
 	}
 
@@ -476,8 +493,12 @@ export default class GameControl extends cc.Component {
 			this.mLevelCount.setScale(1, 1	);
 			this.mLevelUpTip.setScale(1, 1	);
 
-			this.mLevelUpCount.string = "x" + this.levelUpCount;
-
+			if (this.levelUpCount == 10000) {
+				this.levelUpCount = 1;
+				this.mLevelUpCount.string = "max";
+			} else {
+				this.mLevelUpCount.string = "x" + this.levelUpCount;
+			}
 		}
 		
 		this.node.getComponentInChildren(BuilderListControl).showLevelUp();
@@ -485,12 +506,24 @@ export default class GameControl extends cc.Component {
 
 	clickSecondButton() {
 		if (this.isShowlevel) {
-			this.levelUpCount++;
-			if (this.levelUpCount == 10) {
+			if (this.levelUpCount == 1) {
+				this.levelUpCount = 5;
+				this.mLevelUpCount.string = "x5" ;
+			}
+			else if(this.levelUpCount == 5) {
+				this.levelUpCount = 10;
+				this.mLevelUpCount.string = "x10" ;
+			}
+			else if (this.levelUpCount == 10) {
+				this.levelUpCount = 10000;
+				this.mLevelUpCount.string = "max" ;
+			}
+			else if (this.levelUpCount == 10000) {
 				this.levelUpCount = 1;
+				this.mLevelUpCount.string = "x1";
 			}
 			this.node.getComponentInChildren(BuilderListControl).changeUpCount(this);
-			this.mLevelUpCount.string = "x" + this.levelUpCount;
+			
 		}
 	}
 	showSale() {
@@ -503,10 +536,12 @@ export default class GameControl extends cc.Component {
 		console.log(" this.mUserInfo.zichang   = " + this.mUserInfo.zichang);
 		console.log(" this.mUserInfo.money   = " + this.mUserInfo.money);
 		if (bean.costtype == 1) {
-			if (this.mUserInfo.money < bean.cost) {
+			if (this.getAllMoney() < bean.cost) {
 				return false;
 			}
 			this.mUserInfo.money -= bean.cost;
+			this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).cost += bean.cost;
+
 		} else if (bean.costtype == 2) {
 			if (this.mUserInfo.zichang < bean.cost) {
 				return false;
@@ -515,7 +550,7 @@ export default class GameControl extends cc.Component {
 		}
 		var req = new RequiteBuyDaoju();
 		req.user = this.usrId;
-		req.costcount = bean.parame + "";
+		req.costcount = bean.cost + "";
 		req.costtype = bean.costtype;
 		req.id = bean.id;
 		req.mapId = this.mUserInfo.current_map;
@@ -535,9 +570,9 @@ export default class GameControl extends cc.Component {
 		this.node.getComponentInChildren(BuilderListControl).updateValue();
 
 		this.aZichang.string = NumberToString.numberToString(this.mUserInfo.zichang);
-		this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money);
+		this.changeAllMoneyCount();
 		this.getEachMoney();
-		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney);
+		this.eachMoney.string = NumberToString.numberToString(this.mEanMoney) + "/s";;
 		var buystr = this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).buy;
 		if (buystr != null && buystr.length > 0) {
 			buystr = buystr + "," + bean.id;
@@ -580,14 +615,96 @@ export default class GameControl extends cc.Component {
 	isShowShop = false;
 	clickShop() {
 		if (this.isShowShop) {
-			this.isShowShop = false;
 			this.node.getComponentInChildren(ShopControl).disShow();
 		} else {
-			this.isShowShop = true;
 			this.node.getComponentInChildren(ShopControl).show();
 		}
 	}
 
+	gainMenoy(id: number, menoy: number) {
+		console.log("this.mUserInfo.money = " + this.mUserInfo.money);
+		console.log("menoy = " + menoy);
+		this.mUserInfo.money += menoy;
+		console.log("this.mUserInfo.money = " + this.mUserInfo.money);
+		this.mUserInfo.mapBuilderStatus.get(id).allmoney = this.mUserInfo.mapBuilderStatus.get(id).allmoney + menoy;
+		this.mUserInfo.mapBuilderStatus.get(id).lastime = new Date().getTime();
+		var req = new RequiteAddMoney();
+		req.user = this.usrId;
+		var item = new RequitAddMoneyItem();
+		item.builderId = id;
+		item.money = menoy + "";
+		req.data.push(item);
+		this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).creat += menoy;
+		HttpUtil.addMoney("addmoney", req);
+		cc.audioEngine.play(this.mCoinSource, false, 1);
+	}
 
+	mFlyCoinList: Array<FlyCoinControl> = new Array<FlyCoinControl>();
+	mFlyCount = 0;
+	flyCoin(x: number, y: number, count: number) {
+		var coin: FlyCoinControl;
+		if (this.mFlyCoinList.length == 0) {
+			var loadobj = cc.instantiate(this.mFlyCoin);
+			cc.find("Canvas/Main Camera/builderUi").addChild(loadobj);
+			coin = loadobj.getComponent(FlyCoinControl);
+			this.mFlyCoinList.push(coin);
+		}
+		if (coin == null) {
+			for (var i = 0; i < this.mFlyCoinList.length; i++) {
+				if (!this.mFlyCoinList[i].isInit) {
+					coin = this.mFlyCoinList[i];
+					break;
+				}
+			}
+			if (coin == null) {
+				var loadobj2 = cc.instantiate(this.mFlyCoin);
+				cc.find("Canvas/Main Camera/builderUi").addChild(loadobj2);
+				coin = loadobj2.getComponent(FlyCoinControl);
+				this.mFlyCoinList.push(coin);
+			}
+		}
+		this.mFlyCount += count;
+		coin.node.setPosition(x, y);
+		coin.init(count, this);
+		this.flyCountTx(x, y, count);
+
+	}
+	flyCoinEnd(count: number) {
+		this.mFlyCount -= count;
+		this.changeAllMoneyCount();
+	}
+	changeAllMoneyCount() {
+		this.allMeney.string = NumberToString.numberToString(this.mUserInfo.money - this.mFlyCount );
+	}
+	getAllMoney(): number {
+		return this.mUserInfo.money - this.mFlyCount;
+	}
+
+	mFlyTextList: Array<FlyTextControl> = new Array<FlyTextControl>();
+	flyCountTx(x: number, y: number, count: number) {
+		var coin: FlyTextControl;
+		if (this.mFlyTextList.length == 0) {
+			var loadobj = cc.instantiate(this.mFlyText);
+			cc.find("Canvas/Main Camera/builderUi").addChild(loadobj);
+			coin = loadobj.getComponent(FlyTextControl);
+			this.mFlyTextList.push(coin);
+		}
+		if (coin == null) {
+			for (var i = 0; i < this.mFlyTextList.length; i++) {
+				if (!this.mFlyTextList[i].isInit) {
+					coin = this.mFlyTextList[i];
+					break;
+				}
+			}
+			if (coin == null) {
+				var loadobj2 = cc.instantiate(this.mFlyCoin);
+				cc.find("Canvas/Main Camera/builderUi").addChild(loadobj2);
+				coin = loadobj2.getComponent(FlyTextControl);
+				this.mFlyTextList.push(coin);
+			}
+		}
+		coin.node.setPosition(x, y+45.5);
+		coin.init(count);
+	}
 
 }

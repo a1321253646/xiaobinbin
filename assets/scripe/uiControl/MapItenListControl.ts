@@ -26,8 +26,8 @@ export default class NewClass extends cc.Component {
 		if (this.mStatus == 1) {
 			var p = this.node.getPosition();
 			var x = p.x + this.moveXIdel;
-			if (p.x + this.moveXIdel >= -215) {
-				x = -215;
+			if (p.x + this.moveXIdel >= -225) {
+				x = -225;
 				this.mStatus = 0;
 			}
 			this.node.setPosition(x, p.y);

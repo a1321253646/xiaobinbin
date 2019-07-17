@@ -91,9 +91,11 @@ export default class NewClass extends cc.Component {
 		control.init(this.mGame, back,isHaveNext);
 	}
 	show() {
+		this.mGame.isShowShop = true;
 		this.node.setScale(1, 1);
 	}
 	disShow() {
+		this.mGame.isShowShop = false;
 		this.node.setScale(0, 0);
 	}
 }

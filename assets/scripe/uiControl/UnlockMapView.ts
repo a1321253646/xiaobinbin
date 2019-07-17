@@ -63,12 +63,12 @@ export default class NewClass extends cc.Component {
 			var cost = Number(this.mGame.mUserInfo.mapInfo.get(id).cost);
 			this.mIconTx.node.setScale(1, 1);
 			this.mIconTx.string = NumberToString.numberToString(cost);
-			this.mTitle.string = "进军" + this.mGame.mUserInfo.mapInfo.get(id).name + ",需要消耗考察费用:";
+			this.mTitle.string = "进军" + this.mGame.mUserInfo.mString.get(this.mGame.mUserInfo.mapInfo.get(id).name) + ",需要消耗考察费用:";
 			this.mLockIm.node.setScale(0, 0);
 			this.mButton.setScale(1, 1);
 		} else {
 			this.mIconRoot.setScale(0, 0);
-			this.mTitle.string = "收购" + this.mGame.mUserInfo.mapInfo.get(preMapId).name + ",才可进军" + this.mGame.mUserInfo.mapInfo.get(id).name;
+			this.mTitle.string = "收购" + this.mGame.mUserInfo.mString.get(this.mGame.mUserInfo.mapInfo.get(preMapId).name) + ",才可进军" + this.mGame.mUserInfo.mString.get( this.mGame.mUserInfo.mapInfo.get(id).name);
 			this.mLockIm.node.setScale(1, 1);
 			this.mButton.setScale(0, 0);
 		}

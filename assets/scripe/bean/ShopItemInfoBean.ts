@@ -7,5 +7,5 @@ export default class ShopItemInfoBean {
 	parame = 0;
 	cost = 0;
 	icon = "";
-	desc = "";
+	desc = 0;
 }

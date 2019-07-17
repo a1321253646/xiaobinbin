@@ -13,6 +13,9 @@ export default class NewClass extends cc.Component {
 	@property(cc.Sprite)
 	icon: cc.Sprite = null;
 
+	@property(cc.Sprite)
+	mBack: cc.Sprite = null;
+
 	@property(cc.Label)
 	tx: cc.Label = null;
 
@@ -31,6 +34,7 @@ export default class NewClass extends cc.Component {
 		this.icon.node.on(cc.Node.EventType.TOUCH_START, this.touchStart, this);
 		this.icon.node.on(cc.Node.EventType.TOUCH_END, this.touchEnd, this);
 		this.setEnable();
+		this.changeUpCount(this.mGame);
 	}
 	showLoad() {
 		this.icon.node.off(cc.Node.EventType.TOUCH_START);
@@ -42,8 +46,8 @@ export default class NewClass extends cc.Component {
 	update(dt) {
 		if (this.isTouch) {
 			this.mTime += dt;
-			if (this.mTime > 1) {
-				this.mTime -= 1;
+			if (this.mTime >= 0.5) {
+				this.mTime -= 0.5;
 				this.levelup(this.mGame.levelUpCount,false);
 			}
 		}
@@ -116,7 +120,7 @@ export default class NewClass extends cc.Component {
 				isAllUp = false;
 				break;
 			}
-			if (this.mGame.mUserInfo.money > this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost + cost) {
+			if (this.mGame.getAllMoney() >= this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost + cost) {
 				level++;
 				cost += this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost;		
 			} else {
@@ -160,16 +164,17 @@ export default class NewClass extends cc.Component {
 	changeUpCount(game: GameControl) {
 		var count = this.mMax - this.mMin;
 		var coat = 0;
-		console.log("game  =" + game);
 		if (game.levelUpCount < count) {
 			count = game.levelUpCount;
 		}
 		for (var i = 0; i < count; i++) {
-			if (this.mBean.level + i > this.mMax) {
+			if (this.mBean.level + i >= this.mMax) {
 				break;
 			}
 			coat += game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level+i).level_up_cost;
 		}
+		console.log("coat  =" + coat + " game.mUserInfo.money=" + game.mUserInfo.money);
+
 		this.cost.string = NumberToString.numberToString(coat);
 	}
 }

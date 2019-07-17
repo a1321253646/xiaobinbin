@@ -23,5 +23,6 @@ export default class UserDateBean {
 	mHaveMap: Map<number, HaveMapInfo> = new Map<number, HaveMapInfo>();
 	mShopItem: Map<number, ShopItemInfoBean> = new Map<number, ShopItemInfoBean>();
 	mZichangToJingbin: Array<ZichangToJinbinBean> = new Array<ZichangToJinbinBean>();
+	mString: Map<number, string> = new Map<number, string>()
 
 }

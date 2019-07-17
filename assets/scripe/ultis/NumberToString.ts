@@ -23,7 +23,12 @@ export default class NumberToString {
 		//	console.log("numberToString a= " + a);
 			num = num / a;
 		//	console.log("numberToString num= " + num);
-			back = num.toFixed(2);
+			if (num > 100) {
+				back = num.toFixed(1);
+			} else {
+				back = num.toFixed(2);
+			}
+			
 			num = Number(back);
 			return num + uint;
 		} else {

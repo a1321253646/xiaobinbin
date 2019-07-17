@@ -43,7 +43,7 @@ export default class NewClass extends cc.Component {
 	isEable(): boolean {
 		console.log("this.mGame.mUserInfo.money = " + this.mGame.mUserInfo.money);
 		console.log("this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost = " + this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost);
-		if (this.mGame.mUserInfo.money >= this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost) {
+		if (this.mGame.getAllMoney()  >= this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost) {
 			return true;
 		} else {
 			return false;
