@@ -3,7 +3,6 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class BuilderJsonInfo {
 	id = 0;
-	name = "default";
 	level_up_cost = 0;
 	creatBase = 0;
 	icon = 0;

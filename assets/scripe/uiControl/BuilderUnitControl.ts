@@ -1,4 +1,4 @@
-const { ccclass, property } = cc._decorator;
+﻿const { ccclass, property } = cc._decorator;
 import BuilderStatusBean from '../bean/BuilderStatusBean';
 import BuilderUiControl from './BuilderUiControl';
 import BuilderJsonInfo from './BuilderUiControl';
@@ -43,7 +43,7 @@ export default class NewClass extends cc.Component {
 	isEable(): boolean {
 		console.log("this.mGame.mUserInfo.money = " + this.mGame.mUserInfo.money);
 		console.log("this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost = " + this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost);
-		if (this.mGame.mUserInfo.money >= this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost) {
+		if (this.mGame.getAllMoney()  >= this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(0).level_up_cost) {
 			return true;
 		} else {
 			return false;
@@ -54,6 +54,11 @@ export default class NewClass extends cc.Component {
 		if (!this.isEnable && this.isEable()) {
 			this.isEnable = true;
 			this.mGame.enableBuilder(this.mId);
+			if (this.mId == 10001 && this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).time == 0) {
+				this.mGame.mGuideControl.disShow();
+				this.mGame.guide(2);
+			}
+
 			return;
 		}		
 	}

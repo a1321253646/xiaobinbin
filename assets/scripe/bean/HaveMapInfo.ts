@@ -10,4 +10,6 @@ export default class HaveMapInfo {
 	shopcount = 0;
 	buy = "";
 	zibenbeilv = 0;
+	moneybeilv = 0;
+	timebeilv = 0;
 }

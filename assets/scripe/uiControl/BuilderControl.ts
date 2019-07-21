@@ -35,11 +35,12 @@ export default class NewClass extends cc.Component {
 			}
 
 		} 
-		
+		console.log("showLoaded level=" + level);
+		console.log("showLoaded this.mId=" + this.mId);
 		var icon = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(level).icon;
-		
+		console.log("showLoaded icon=" + icon);
 		var info = this.mGame.mUserInfo.mapBuilderInfo.get(icon);
-		
+		console.log("showLoaded info.icon=" + info.icon);
 		var self = this;
 		game.isLoadingCount++;
 		cc.loader.load("http://120.79.249.55/images/jianzhu/" + info.icon + ".png", function (err, texture) {
@@ -73,7 +74,7 @@ export default class NewClass extends cc.Component {
 			this.mUi.init(this.mId, this.mGame);
 			this.mIcon.setState(0);
 			//this.mUi.node.setScale(1, 1);
-		} else {;
+		} else {
 			this.mUi.unInit(this.mId, this.mGame);
 			this.mIcon.setState(1);
 			//this.mUi.node.setScale(0, 0);
@@ -92,13 +93,38 @@ export default class NewClass extends cc.Component {
 
 	showLoaded() {
 		var self = this;
-		var icon = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mGame.mUserInfo.mapBuilderStatus.get(this.mId).level).icon;
-		console.log("showLoaded icon="+icon);
+
+		var level = 0;
+		if (this.mGame.mUserInfo.mapBuilderStatus != null) {
+			var status = this.mGame.mUserInfo.mapBuilderStatus.get(this.mId);
+
+			if (status == null) {
+				level = 0;
+			} else {
+				level = status.level;
+			}
+
+		} 
+
+		var icon = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(level).icon;
+		
 		var info = this.mGame.mUserInfo.mapBuilderInfo.get(icon);
+		
 		cc.loader.load("http://120.79.249.55/images/jianzhu/" + info.icon + ".png", function (err, texture) {
 			var sprite = new cc.SpriteFrame(texture);
 			self.mIcon.spriteFrame = sprite;
 		});
+		var x = Number(info.position.split(",")[0]);
+		var y = Number(info.position.split(",")[1]);
+		this.node.setPosition(new cc.Vec2(x, y));
+
+		var w = Number(info.size.split(",")[0]);
+		var l = Number(info.size.split(",")[1]);
+		this.node.setContentSize(w, l);
+		this.mUi.node.position = this.node.position;
+
+		this.mUi.node.setScale(1, 1);
+		this.node.setScale(1, 1);
 
 	/*	cc.loader.loadRes("jianzhu/" + info.icon, cc.SpriteFrame, function (err, spriteFrame) {
 			self.mIcon.spriteFrame = spriteFrame;
@@ -131,6 +157,8 @@ export default class NewClass extends cc.Component {
 	updateValue() {
 		this.mUi.updateValue();
 	}
-
+	guide(index: number) {
+		this.mUi.guide(index);
+	}
 
 }

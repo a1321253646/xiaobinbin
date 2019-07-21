@@ -7,7 +7,8 @@ export default class BuilderStatusBean {
 	level = 0;
 	time_pre = 1;
 	money_pre = 1;
-	eachmoney = 0;
 	lastime = 0;
 	auto = 0;
+	creatBase = 0;
+	creatTime = 0;
 }

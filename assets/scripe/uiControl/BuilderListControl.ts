@@ -129,5 +129,9 @@ export default class NewClass extends cc.Component {
 			value.updateValue();
 		});
 	}
-
+	guide(index: number) {
+		if (index == 4) {
+			this.mControlList.get(10001).guide(index);
+		}
+	}
 }

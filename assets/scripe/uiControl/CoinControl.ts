@@ -17,6 +17,33 @@ export default class NewClass extends cc.Component {
 		if (!this.idDonw && !this.isUping) {
 			return;
 		}
+		if (this.isCollisionStatus == 1 || this.isCollisionStatus == 2) {
+			if (this.isCollisionStatus == 1) {
+				this.isCollisionIngTime += dt;
+			} else {
+				this.isCollisionIngTime -= dt;
+			}
+			
+			if (this.isCollisionIngTime >= 0.15) {
+				this.isCollisionIngTime = 0.15;
+				if (this.isCollisionStatus == 1) {
+					this.isCollisionStatus = 2;
+				}
+			}
+			else if (this.isCollisionIngTime <= 0) {
+				this.isCollisionIngTime = 0;
+				if (this.isCollisionStatus == 2) {
+					this.isCollisionStatus = -1;
+					
+				}
+			}
+			var scale = 0.2 * (this.isCollisionIngTime / 0.15) + 1;
+			this.node.setScale(scale, scale);
+			if (this.isCollisionStatus == -1) {
+				
+			}
+			return;
+		}
 		this.mTime += dt;
 		if (this.mTime > 0.4) {
 			this.mTime = 0;
@@ -74,10 +101,17 @@ export default class NewClass extends cc.Component {
 		this.mCollider.enabled = false;
 		
 	}
-
-	onCollisionEnter (other, self) {
-		console.log('on collision enter');
+	isCollisionStatus = -1;
+	isCollisionIngTime = 0;
+	onCollisionEnter(other, self) {
+		console.log('on collision onCollisionEnter');
 		this.mUiControl.gainMoney();
 		
+		
+	}
+	onCollisionExit(other, self) {
+
+		console.log('on collision onCollisionExit');
+
 	}
 }

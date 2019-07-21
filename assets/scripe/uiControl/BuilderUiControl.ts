@@ -157,6 +157,8 @@ export default class NewClass extends cc.Component {
 	updateValue() {
 		this.mCoinControl.updateValue();
 	}
-
+	guide(index: number) {
+		this.mLevelUpControl.guide(index);
+	}
     // update (dt) {}
 }

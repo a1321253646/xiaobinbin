@@ -4,7 +4,7 @@ const { ccclass, property } = cc._decorator;
 export default class MapBuilderInfo {
 	id = 0;
 	position = "default";
-	name = "default";
+	name = 0;
 	creattime = 0;
 	size = "default";
 	icon = "default";

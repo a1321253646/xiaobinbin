@@ -33,6 +33,7 @@ export default class NewClass extends cc.Component {
 		console.log(" this.mBean.icon id  = " + this.mId);
 		this.mBean = this.mGame.mUserInfo.mShopItem.get(id);
 		console.log(" this.mBean.icon = " + this.mBean.icon);
+		console.log(" this.mBean.icon cost  = " + this.mBean.cost);
 		cc.loader.load("http://120.79.249.55/images/shopItemIcon/" + this.mBean.icon + ".png", function (err, texture) {
 			var sprite = new cc.SpriteFrame(texture);
 			self.icon.spriteFrame = sprite;
@@ -49,7 +50,7 @@ export default class NewClass extends cc.Component {
 			self.mCostIcon.spriteFrame = spriteFrame;
 		});
 
-		console.log(" this.mBean.icon cost  = " + this.mBean.cost);
+		
 		this.mCostCount.string = NumberToString.numberToString(this.mBean.cost);
 		
 		if (this.mBean.dealtype == 1) {
@@ -64,26 +65,56 @@ export default class NewClass extends cc.Component {
 	}
 
 
+	updateValue() {
+		if (this.mBean.costtype == 1) {
+			if (this.mGame.getAllMoney() >= this.mBean.cost) {
+				this.mButton.interactable = true;
+			} else {
+				this.mButton.interactable = false;
+			}
+		} else if (this.mBean.costtype == 2) {
+			if (this.mGame.mUserInfo.zichang >= this.mBean.cost) {
+				this.mButton.interactable = true;
+			} else {
+				this.mButton.interactable = false;
+			}
+		}
+	}
+
 
 
 	getString(): string {
-		var back = "123123123";
-		/*if (this.mBean.desc.split("&n").length > 1) {
+		console.log(" this.mBean.des  = " + this.mBean.desc);
+		//console.log(" this.mBean.des  = " + this.mBean.des);
+		var back = this.mGame.mUserInfo.mString.get(this.mBean.desc);
+		console.log(" this.mBean.des  back= " + back);
+		if (back.match("&n")) {
+			console.log(" back.match( & n) ");
 			var b = this.mGame.mUserInfo.mapBuilderStatus.get(this.mBean.parame);
 			var level = 0;
 			if (b != null) {
 				level = this.mGame.mUserInfo.mapBuilderStatus.get(this.mBean.parame).level;
 			}
-			var name = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mBean.parame).get(level).name;
-			back = this.mBean.desc.replace("&n", name);
+			var resource = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mBean.parame).get(level).icon
+			console.log(" resource =  " + resource);
+			
+			var name = this.mGame.mUserInfo.mString.get(this.mGame.mUserInfo.mapBuilderInfo.get(resource).name);
+			console.log(" name =  " + name);
+			back = back.replace("&n", name);
 		}
-		if (this.mBean.desc.split("&p").length > 1) {
+		if (back.match("&p")) {
+			console.log(" back.match( & p) ");
 			var newStr = "";
 			var b2 = this.mBean.parame / 100;
+			if (b2 > 100) {
+				b2 = b2 / 100;
+			}
 			var b2str = b2.toFixed(2);
 			b2 = Number(b2str);
-			back = this.mBean.desc.replace("&p", b2+"");
-		}*/
+			back = back.replace("&p", b2+"");
+		}
+		back = back.replace("\\n","\n");
+		console.log("end this.mBean.des  = " + back);
 		return back;
 	}
 
