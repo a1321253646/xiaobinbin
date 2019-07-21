@@ -289,6 +289,7 @@ export default class GameControl extends cc.Component {
 			if (this.isLoadingCount == 0) {
 				this.isLoading = false;
 				this.mLoading.node.setScale(0, 0);
+				this.mGuideControl.init(this);
 			} else {
 				this.mLoadingBar.progress = (this.isLoadingCountMax - this.isLoadingCount) / this.isLoadingCountMax;
 			}
@@ -786,8 +787,7 @@ export default class GameControl extends cc.Component {
 		if (index == 2) {
 		}
 		else if (index == 3) {
-			var showLevel = cc.find("Canvas/Main Camera/gameUi/levelShow");
-			this.mGuideControl.show(showLevel.getPosition().x, showLevel.getPosition().y, showLevel.getContentSize().width, showLevel.getContentSize().height, "打开升级界面", 1);
+
 		}
 		else if (index == 4) {
 			this.node.getComponentInChildren(BuilderListControl).guide(3);

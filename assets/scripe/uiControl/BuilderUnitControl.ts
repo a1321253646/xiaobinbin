@@ -38,12 +38,6 @@ export default class NewClass extends cc.Component {
 //		}
 		
 		this.node.getComponentInChildren(UinitCoinControl).init(this);
-
-		if (id == 10001 && game.mUserInfo.mHaveMap.get(game.mUserInfo.current_map).time == 0) {
-			this.mGame.mGuideControl.show(this.node.parent.getPosition().x + this.node.getPosition().x + this.coinIcon.node.getPosition().x,
-				this.node.parent.getPosition().y + this.node.getPosition().y + this.coinIcon.node.getPosition().y,
-				this.coinIcon.node.getContentSize().width, this.coinIcon.node.getContentSize().height, "激活第一个建筑",1);
-		}
 	}
 
 	isEable(): boolean {
