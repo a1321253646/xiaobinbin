@@ -157,6 +157,8 @@ export default class NewClass extends cc.Component {
 	updateValue() {
 		this.mUi.updateValue();
 	}
-
+	guide(index: number) {
+		this.mUi.guide(index);
+	}
 
 }

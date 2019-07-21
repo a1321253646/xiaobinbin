@@ -1,4 +1,4 @@
-const { ccclass, property } = cc._decorator;
+﻿const { ccclass, property } = cc._decorator;
 import BuilderStatusBean from '../bean/BuilderStatusBean';
 import BuilderUiControl from './BuilderUiControl';
 import BuilderJsonInfo from './BuilderUiControl';
@@ -38,6 +38,12 @@ export default class NewClass extends cc.Component {
 //		}
 		
 		this.node.getComponentInChildren(UinitCoinControl).init(this);
+
+		if (id == 10001 && game.mUserInfo.mHaveMap.get(game.mUserInfo.current_map).time == 0) {
+			this.mGame.mGuideControl.show(this.node.parent.getPosition().x + this.node.getPosition().x + this.coinIcon.node.getPosition().x,
+				this.node.parent.getPosition().y + this.node.getPosition().y + this.coinIcon.node.getPosition().y,
+				this.coinIcon.node.getContentSize().width, this.coinIcon.node.getContentSize().height, "激活第一个建筑",1);
+		}
 	}
 
 	isEable(): boolean {
@@ -54,6 +60,11 @@ export default class NewClass extends cc.Component {
 		if (!this.isEnable && this.isEable()) {
 			this.isEnable = true;
 			this.mGame.enableBuilder(this.mId);
+			if (this.mId == 10001 && this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).time == 0) {
+				this.mGame.mGuideControl.disShow();
+				this.mGame.guide(2);
+			}
+
 			return;
 		}		
 	}

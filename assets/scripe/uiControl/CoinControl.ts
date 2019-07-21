@@ -40,7 +40,7 @@ export default class NewClass extends cc.Component {
 			var scale = 0.2 * (this.isCollisionIngTime / 0.15) + 1;
 			this.node.setScale(scale, scale);
 			if (this.isCollisionStatus == -1) {
-				this.mUiControl.gainMoney();
+				
 			}
 			return;
 		}
@@ -104,19 +104,13 @@ export default class NewClass extends cc.Component {
 	isCollisionStatus = -1;
 	isCollisionIngTime = 0;
 	onCollisionEnter(other, self) {
-		if (this.isCollisionStatus != -1) {
-			return;
-		}
-		this.isCollisionStatus = 1;
-		this.isCollisionIngTime = 0;
-		console.log('on collision enter');
+		console.log('on collision onCollisionEnter');
+		this.mUiControl.gainMoney();
 		
 		
 	}
 	onCollisionExit(other, self) {
-		if (this.isCollisionStatus != -1) {
-			return;
-		}
+
 		console.log('on collision onCollisionExit');
 
 	}

@@ -1,8 +1,10 @@
-const {ccclass, property} = cc._decorator;
+﻿const {ccclass, property} = cc._decorator;
 import BuilderStatusBean from '../bean/BuilderStatusBean';
 import GameControl from '../uiControl/GameControl';
 import BuilderUiControl from './BuilderUiControl';
 import BuilderJsonInfo from './BuilderUiControl';
+import LevelEnableControl from './LevelEnableControl';
+import GuideControl from './GuideControl';
 import NumberToString from '../ultis/NumberToString';
 @ccclass
 export default class NewClass extends cc.Component {
@@ -21,6 +23,7 @@ export default class NewClass extends cc.Component {
 
 	@property(cc.Label)
 	cost: cc.Label = null;
+
 
 	mBean: BuilderStatusBean;
 	mGame: GameControl;
@@ -42,13 +45,72 @@ export default class NewClass extends cc.Component {
 
 	}
 
-	
+	mCost = 0;
+	isCanUp = true;
+
+	mLevelIconStatus = 0;//0为正常状态，1为放大中，2为放大结束，3为缩小中
+	mIconChangeTime = 0;
 	update(dt) {
 		if (this.isTouch) {
 			this.mTime += dt;
 			if (this.mTime >= 0.5) {
 				this.mTime -= 0.5;
 				this.levelup(this.mGame.levelUpCount,false);
+			}
+		}
+		if (this.mGame != null) {
+
+			if (this.mGameMoney != this.mGame.getAllMoney()) {
+				this.changeUpCount(this.mGame);
+			}
+			if (this.mGame.getAllMoney() < this.mCost && this.isCanUp) {
+				this.changeUpCount(this.mGame);
+				if (this.mGame.getAllMoney() < this.mCost && this.isCanUp) {
+
+					this.icon.setState(1);
+					this.isCanUp = false;
+					this.icon.node.off(cc.Node.EventType.TOUCH_START);
+					this.icon.node.off(cc.Node.EventType.TOUCH_END);
+					this.isTouch = false;
+				}
+
+				
+			} else if (this.mGame.getAllMoney() >= this.mCost && !this.isCanUp) {
+				this.changeUpCount(this.mGame);
+				if (this.mGame.getAllMoney() >= this.mCost && !this.isCanUp) {
+					this.icon.setState(0);
+					this.isCanUp = true;
+					this.icon.node.on(cc.Node.EventType.TOUCH_START, this.touchStart, this);
+					this.icon.node.on(cc.Node.EventType.TOUCH_END, this.touchEnd, this);
+				}
+
+			}
+		}
+		if (this.mLevelIconStatus == 1) {
+			this.mIconChangeTime += dt;
+			if (this.mIconChangeTime >= 0.1) {
+				this.mIconChangeTime = 0.1;
+			}
+			this.icon.node.setScale(1 + 0.2 * (this.mIconChangeTime / 0.1));
+			if (this.mIconChangeTime == 0.1) {
+				this.mLevelIconStatus = 2;
+				this.mIconChangeTime = 0;
+			}
+			return;
+		}
+		if (this.mLevelIconStatus == 2 && !this.isTouch) {
+			this.mLevelIconStatus = 3;
+		}
+		if (this.mLevelIconStatus == 3) {
+			this.mIconChangeTime += dt;
+			if (this.mIconChangeTime >= 0.1) {
+				this.mIconChangeTime = 0.1;
+			}
+
+			this.icon.node.setScale(1.2 - 0.2 * (this.mIconChangeTime / 0.1));
+			if (this.mIconChangeTime == 0.1) {
+				this.mLevelIconStatus = 0;
+				this.mIconChangeTime = 0;
 			}
 		}
 	}
@@ -88,14 +150,19 @@ export default class NewClass extends cc.Component {
 		console.log("this.mBean.level =" + this.mBean.level + " this.mMax = " + this.mMax);
 		this.prigressBar.node.setScale(1, 1);
 		this.prigressBar.progress = (this.mBean.level - this.mMin) / (this.mMax - this.mMin);
-		this.tx.string ="Lv"+ this.mBean.level;
+		this.tx.string = "Lv" + this.mBean.level;
+		this.mCost = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost;
 		this.cost.string = NumberToString.numberToString(this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost );
 	}
-
 	touchStart(event) {
 		this.isTouch = true;
 		this.mTime = 0;
-		this.levelup(this.mGame.levelUpCount,true);
+		this.levelup(this.mGame.levelUpCount, true);
+		this.mLevelIconStatus = 1;
+		this.mIconChangeTime = 0;
+
+
+
 	}
 	touchEnd(event) {
 		this.isTouch = false;
@@ -139,7 +206,7 @@ export default class NewClass extends cc.Component {
 				this.mGame.showLoading(this.mId);
 			}
 		} else {
-			//TODO ��Ҳ�����ʾ
+			//TODO 金币不足提示
 		}
 	}
 
@@ -158,10 +225,12 @@ export default class NewClass extends cc.Component {
 		this.prigressBar.progress = (this.mBean.level - this.mMin) / (this.mMax - this.mMin);
 		this.tx.string = "Lv" + this.mBean.level;
 		this.changeUpCount(this.mGame);
+		var binfo = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level);
 	//	this.cost.string = NumberToString.numberToString(this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).level_up_cost);
 	}
-
+	mGameMoney = 0;
 	changeUpCount(game: GameControl) {
+		this.mGameMoney = game.getAllMoney();
 		var count = this.mMax - this.mMin;
 		var coat = 0;
 		if (game.levelUpCount < count) {
@@ -171,10 +240,23 @@ export default class NewClass extends cc.Component {
 			if (this.mBean.level + i >= this.mMax) {
 				break;
 			}
-			coat += game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level+i).level_up_cost;
+			coat += game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost;
+			if (game.levelUpCount > 100 && coat > game.getAllMoney()) {
+				if (coat != game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost) {
+					coat -= game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost;
+				}
+				break;
+			}
 		}
 		console.log("coat  =" + coat + " game.mUserInfo.money=" + game.mUserInfo.money);
-
+		this.mCost = coat;
 		this.cost.string = NumberToString.numberToString(coat);
+	}
+	guide(index: number) {
+		if (index == 4) {
+			this.mGame.mGuideControl.show(this.node.parent.getPosition().x + this.node.getPosition().x + this.icon.node.getPosition().x,
+				this.node.parent.getPosition().y + this.node.getPosition().y + this.icon.node.getPosition().y,
+				this.icon.node.getContentSize().width, this.icon.node.getContentSize().height, "升级第一个建筑", 1);
+		}
 	}
 }

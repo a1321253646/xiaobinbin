@@ -65,6 +65,22 @@ export default class NewClass extends cc.Component {
 	}
 
 
+	updateValue() {
+		if (this.mBean.costtype == 1) {
+			if (this.mGame.getAllMoney() >= this.mBean.cost) {
+				this.mButton.interactable = true;
+			} else {
+				this.mButton.interactable = false;
+			}
+		} else if (this.mBean.costtype == 2) {
+			if (this.mGame.mUserInfo.zichang >= this.mBean.cost) {
+				this.mButton.interactable = true;
+			} else {
+				this.mButton.interactable = false;
+			}
+		}
+	}
+
 
 
 	getString(): string {
@@ -90,6 +106,9 @@ export default class NewClass extends cc.Component {
 			console.log(" back.match( & p) ");
 			var newStr = "";
 			var b2 = this.mBean.parame / 100;
+			if (b2 > 100) {
+				b2 = b2 / 100;
+			}
 			var b2str = b2.toFixed(2);
 			b2 = Number(b2str);
 			back = back.replace("&p", b2+"");

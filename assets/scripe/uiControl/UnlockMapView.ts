@@ -2,6 +2,7 @@
 import GameControl from './GameControl';
 import HaveMapInfo from '../bean/HaveMapInfo';
 import RequiteAddMap from '../bean/RequiteAddMap';
+import RequiteBuy from '../bean/RequiteBuy';
 import NumberToString from '../ultis/NumberToString';
 import HttpUtil from '../ultis/HttpUtil';
 
@@ -79,12 +80,24 @@ export default class NewClass extends cc.Component {
 	}
 	sure() {
 		this.mGame.showChange();
-		var bean = new RequiteAddMap();
-		bean.user = this.mGame.usrId;
-		bean.cost = this.mGame.mUserInfo.mapInfo.get(this.mId).cost + "";
-		bean.mapid = this.mId;
-		bean.isnew = 1;
-		HttpUtil.addMap("addmap", bean);
+
+		this.mGame.mUserInfo.money -= this.mGame.mUserInfo.mapInfo.get(this.mId).cost;
+		this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).cost += this.mGame.mUserInfo.mapInfo.get(this.mId).cost;
+
+		var req = new RequiteBuy();
+		req.type = 4;
+		req.mapid = this.mGame.mUserInfo.current_map;
+		req.allMoney = this.mGame.mUserInfo.money + "";
+		req.allZichang = this.mGame.mUserInfo.zichang + "";
+		req.histroy = this.mGame.mUserInfo.history + "";
+		req.mapCreat = this.mGame.mUserInfo.mHaveMap.get(req.mapid).creat + "";
+		req.mapCost = this.mGame.mUserInfo.mHaveMap.get(req.mapid).cost + "";
+		req.user = this.mGame.usrId;
+		req.buyMapId = this.mId;
+		req.zibenbeilv = this.mGame.mUserInfo.mHaveMap.get(req.mapid).zibenbeilv + "";
+		req.moneybeilv = this.mGame.mUserInfo.mHaveMap.get(req.mapid).moneybeilv + "";
+		req.timebeilv = this.mGame.mUserInfo.mHaveMap.get(req.mapid).timebeilv + "";
+		HttpUtil.map("buy", req);
 
 	}
 }

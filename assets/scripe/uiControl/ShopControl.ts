@@ -92,6 +92,9 @@ export default class NewClass extends cc.Component {
 	}
 	show() {
 		this.mGame.isShowShop = true;
+		this.mControlList.forEach((value, key) => {
+			value.updateValue();
+		});
 		this.node.setScale(1, 1);
 	}
 	disShow() {

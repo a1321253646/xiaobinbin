@@ -126,7 +126,11 @@ export default class NewClass extends cc.Component {
 
 				}				
 				console.log("outline time money = " + this.mMoney);
-				this.coinTx.string = NumberToString.numberToString(this.mMoney);
+				if (this.mMoney > 0) {
+					this.coinTx.string = NumberToString.numberToString(this.mMoney);
+				} else {
+					this.coinTx.string = "";
+				}			
 				this.mCointControl.show();
 				return;
 			} else {
@@ -228,33 +232,32 @@ export default class NewClass extends cc.Component {
 		/*console.log("info.creattime = " + info.creattime);
 		console.log(" this.mBean.time_pre = " + this.mBean.time_pre);
 		console.log("this.mGame.mMapTimePre = " + this.mGame.mMapTimePre);*/
-		this.mCreateTime = info.creattime * (this.mBean.time_pre / 10000) * (this.mGame.mMapTimePre / 10000); 
-		//console.log("this.mCreateTime = " + this.mCreateTime);
+		this.mCreateTime = info.creattime * (this.mBean.time_pre / 10000);
+		this.mBean.creatTime = info.creattime;
 		this.mCreateTime = this.mCreateTime / 1000;
-		//console.log("this.mCreateTime = " + this.mCreateTime);
+		this.mCreateTime = this.mCreateTime * (this.mGame.mMapTimePre / 10000); 
 
 
-	/*	console.log("this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase = " + this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase);
-		console.log("this.mBean.money_pre = " + this.mBean.money_pre);
-		console.log("this.mGame.mMapMoneyPre = " + this.mGame.mMapMoneyPre);
-		console.log("(this.mBean.money_pre / 10000) = " + (this.mBean.money_pre / 10000));*/
-		console.log("(this.mGame.mMapMoneyPre / 10000) = " + (this.mGame.mMapMoneyPre / 10000));
-
-
-		this.mCreateMoney = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase * (this.mBean.money_pre / 10000) * (this.mGame.mMapMoneyPre / 10000);
+		this.mCreateMoney = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase * (this.mBean.money_pre / 10000)
+		this.mCreateMoney = this.mCreateMoney * (this.mGame.mMapMoneyPre / 10000);
+		this.mBean.creatBase = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).creatBase;
 		console.log("this.mCreateMoney = " + this.mCreateMoney);
+		
+
+
 		this.mCreateMoney = this.mCreateMoney * beilv;
 		console.log("this.mCreateMoney = " + this.mCreateMoney);
 		this.mCreateMoney = Math.round(this.mCreateMoney);
 		console.log("this.mCreateMoney = " + this.mCreateMoney);
-		this.mBean.eachmoney = this.mCreateMoney * (1 / this.mCreateTime);
-		//console.log("this.mBean.eachmoney = " + this.mBean.eachmoney);
-		this.mBean.eachmoney = Math.round(this.mBean.eachmoney);
+		
+
 
 		this.mMoney = countCreat * this.mCreateMoney;
-		this.coinTx.string = NumberToString.numberToString(this.mMoney);
-
-		//console.log("this.mBean.eachmoney = " + this.mBean.eachmoney);
+		if (this.mMoney > 0) {
+			this.coinTx.string = NumberToString.numberToString(this.mMoney);
+		}
+		
+ 
 		if (this.mBean.auto == 1 && !this.isAdd) {
 			this.isAdd = true;
 		}
@@ -267,6 +270,8 @@ export default class NewClass extends cc.Component {
 		} else if (type == 2) {
 			bean.time_pre = (bean.time_pre * (1 - param / 10000)) >> 0;
 		}
-		
+		var resource = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mBean.id).get(this.mBean.level).icon
+		var name = this.mGame.mUserInfo.mString.get(this.mGame.mUserInfo.mapBuilderInfo.get(resource).name);
+		this.mGame.mLevelEnableControl.show(type, param, name, this.mGame);
 	}
 }
