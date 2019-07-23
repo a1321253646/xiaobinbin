@@ -18,10 +18,10 @@ export default class NewClass extends cc.Component {
 		pos = this.node.convertToNodeSpaceAR(pos);
 		//console.log(" event.getLocationX() =  " + pos.x + "   event.getLocationY()=" + pos.y);
 		this.item.setPosition(pos)
-	//	this.item.getComponent(cc.MotionStreak).enabled = true;
+		this.item.getComponent(cc.MotionStreak).enabled = true;
 	}
 	end(event) {
-	//	this.item.getComponent(cc.MotionStreak).enabled = false;
+		this.item.getComponent(cc.MotionStreak).enabled = false;
 
 		this.item.setPosition(new cc.Vec2(-10000, -10000))
 	}

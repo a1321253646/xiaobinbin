@@ -122,7 +122,7 @@ export default class GameControl extends cc.Component {
 
 
 		//>>>>>>>>>>>>>>>>>>>>>>微信
-		let sysInfo = window.wx.getSystemInfoSync();
+		/*let sysInfo = window.wx.getSystemInfoSync();
 		console.log("sysInfo.screenWidth=" + sysInfo.screenWidth);
 		console.log("sysInfo.screenHeight=" + sysInfo.screenHeight);
 
@@ -235,11 +235,11 @@ export default class GameControl extends cc.Component {
 			console.log("weixin onHide");
 			self.isAppShow = false;
 			self.showChange();
-		})
+		})*/
 		//<<<<<<<<<<<<<<<<<<<<<<<微信
 		this.mBg1.node.on(cc.Node.EventType.TOUCH_START, this.back2Click, this);
 		//>>>>>>>>>>>>>>>>>>>>>>>>>cocos
-		//this.getUserInfo(this.usrId);
+		this.getUserInfo(this.usrId);
 		//<<<<<<<<<<<<<<<<<<<<<<<cocos
 
 	}
@@ -249,10 +249,10 @@ export default class GameControl extends cc.Component {
 		this.node.getComponentInChildren(OtherSettingControl).disShow();
 	}
 	//>>>>>>>>>>>>>>>>>>>>>>微信
-	usrId = "default";
+	//usrId = "default";
 	//<<<<<<<<<<<<<<<<<<<<<<<微信
 	//>>>>>>>>>>>>>>>>>>>>>>>>>cocos
-	//usrId = "xXC5RbZkP";
+	usrId = "xXC5RbZkP";
 	//<<<<<<<<<<<<<<<<<<<<<<<cocos
 	getUserInfo(user2: string) {
 		this.usrId = user2;
