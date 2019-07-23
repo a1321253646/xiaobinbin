@@ -70,5 +70,33 @@
   {
     "ID": 1000018,
     "desc": "&n生产时间缩短&p%"
+  },
+  {
+    "ID": 1000019,
+    "desc": "<outline color=#1C413C width=2>欢迎来到商业帝国，在这里你将白手起家，赚钱赚到数不过来。</outline><color=yellow><outline color=#5D3A16 width=2>先解锁第一个资产</outline></color>"
+  },
+  {
+    "ID": 1000020,
+    "desc": "<outline color=#1C413C width=2>资产会为你带来金币收入，</outline><color=yellow><outline color=#5D3A16 width=2>收集10金币</outline></color><outline color=#1C413C width=2>作为启动资金</outline>"
+  },
+  {
+    "ID": 1000021,
+    "desc": "<outline color=#1C413C width=2>升级资产可以提高金币收入，</outline><color=yellow><outline color=#5D3A16 width=2>升级您的资产</outline></color><outline color=#1C413C width=2>吧！</outline>"
+  },
+  {
+    "ID": 1000022,
+    "desc": "<outline color=#1C413C width=2>再</outline><color=yellow><outline color=#5D3A16 width=2>收集45金币</outline></color><outline color=#1C413C width=2>，解锁第二个资产，看看这个资产能赚多少钱</outline>"
+  },
+  {
+    "ID": 1000023,
+    "desc": "<outline color=#1C413C width=2>接下来</outline><color=yellow><outline color=#5D3A16 width=2>再收集300金币</outline></color><outline color=#1C413C width=2>就可以在商店购买神秘道具了，记得不断升级提高产出</outline>"
+  },
+  {
+    "ID": 1000024,
+    "desc": "<outline color=#1C413C width=2>收集完成！</outline><color=yellow><outline color=#5D3A16 width=2>购买自动生产道具</outline></color><outline color=#1C413C width=2>完成自动生产</outline>"
+  },
+  {
+    "ID": 1000025,
+    "desc": "<outline color=#1C413C width=2>看！便利店开始自动生产了！接下来就看你大展身手了！</outline>"
   }
 ]

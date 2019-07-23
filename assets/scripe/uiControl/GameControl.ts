@@ -122,7 +122,7 @@ export default class GameControl extends cc.Component {
 
 
 		//>>>>>>>>>>>>>>>>>>>>>>微信
-	/*	let sysInfo = window.wx.getSystemInfoSync();
+		let sysInfo = window.wx.getSystemInfoSync();
 		console.log("sysInfo.screenWidth=" + sysInfo.screenWidth);
 		console.log("sysInfo.screenHeight=" + sysInfo.screenHeight);
 
@@ -235,11 +235,11 @@ export default class GameControl extends cc.Component {
 			console.log("weixin onHide");
 			self.isAppShow = false;
 			self.showChange();
-		})*/
+		})
 		//<<<<<<<<<<<<<<<<<<<<<<<微信
 		this.mBg1.node.on(cc.Node.EventType.TOUCH_START, this.back2Click, this);
 		//>>>>>>>>>>>>>>>>>>>>>>>>>cocos
-		this.getUserInfo(this.usrId);
+		//this.getUserInfo(this.usrId);
 		//<<<<<<<<<<<<<<<<<<<<<<<cocos
 
 	}
@@ -249,10 +249,10 @@ export default class GameControl extends cc.Component {
 		this.node.getComponentInChildren(OtherSettingControl).disShow();
 	}
 	//>>>>>>>>>>>>>>>>>>>>>>微信
-	//usrId = "default";
+	usrId = "default";
 	//<<<<<<<<<<<<<<<<<<<<<<<微信
 	//>>>>>>>>>>>>>>>>>>>>>>>>>cocos
-	usrId = "xXC5RbZkP";
+	//usrId = "xXC5RbZkP";
 	//<<<<<<<<<<<<<<<<<<<<<<<cocos
 	getUserInfo(user2: string) {
 		this.usrId = user2;
@@ -349,7 +349,10 @@ export default class GameControl extends cc.Component {
 		this.isLoading = true;
 		this.initShop();
 		this.isLoadingCountMax = this.isLoadingCount;
-		this.mOutLineControl.show(this);
+		if (this.mGuideControl.nGuideIndex == 0) {
+			this.mOutLineControl.show(this);
+		}
+		
 	}
 
 	getEachMoney() {
@@ -443,11 +446,7 @@ export default class GameControl extends cc.Component {
 		this.node.getComponentInChildren(BuilderListControl).enableBuilder(id);
 		this.mUserInfo.money -= this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost;
 		this.mUserInfo.mHaveMap.get(this.mUserInfo.current_map).cost += this.mUserInfo.mapBuilderLevelInfo.get(id).get(0).level_up_cost;
-		if (id == 10002 && this.mUserInfo.zichang == 0) {
-			this.mUserInfo.zichang = 100;
-			this.aZichang.string = this.mUserInfo.zichang + "";
-			this.node.getComponentInChildren(BuilderListControl).updateValue();
-		}
+
 
 		var req2 = new RequiteBuilderStatusBean();
 		req2.copy(buidStatus);
@@ -491,9 +490,10 @@ export default class GameControl extends cc.Component {
 	}
 
 	showLevelUp() {
-		if (this.isShowlevel) {
+
+		if (this.mLevelCount.getScale() == 1) {
 			var self = this;
-			cc.loader.loadRes("levelup/open_lvup" , cc.SpriteFrame, function (err, spriteFrame) {
+			cc.loader.loadRes("levelup/open_lvup", cc.SpriteFrame, function (err, spriteFrame) {
 				self.mLevelImg.spriteFrame = spriteFrame;
 			});
 			this.isShowlevel = false;
@@ -511,8 +511,8 @@ export default class GameControl extends cc.Component {
 			this.mTouchLayout.setScale(0, 0);
 			this.mBaoxiang.setScale(0, 0);
 			this.mShopping.setScale(0, 0);
-			this.mLevelCount.setScale(1, 1	);
-			this.mLevelUpTip.setScale(1, 1	);
+			this.mLevelCount.setScale(1, 1);
+			this.mLevelUpTip.setScale(1, 1);
 
 			if (this.levelUpCount == 10000) {
 				this.mLevelUpCount.string = "max";
@@ -520,7 +520,6 @@ export default class GameControl extends cc.Component {
 				this.mLevelUpCount.string = "x" + this.levelUpCount;
 			}
 		}
-		
 		this.node.getComponentInChildren(BuilderListControl).showLevelUp();
 	}
 

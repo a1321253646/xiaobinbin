@@ -166,14 +166,14 @@ export default class HttpUtil {
 					console.log("post user =" + user);
 					console.log("post target.usrId =" + target.usrId);
 					//>>>>>>>>>>>>>>>>>>>>>>н╒пе
-	/*
+	
 					if (user != target.usrId) {
 						console.log(" user !=target.usrId");
 						wx.setStorage({
 							key: "userId",
 							data: user
 						})
-					}*/
+					}
 					//<<<<<<<<<<<<<<<<<<<<<<<н╒пе
 					target.usrId = user;
 					console.log("post param1 =" + param2);

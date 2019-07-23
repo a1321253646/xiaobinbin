@@ -122,15 +122,15 @@ export default class NewClass extends cc.Component {
 		console.log("salezichang time123 =  " + time123);
 		console.log(" time =  " + time123);
 		if (this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).time == 0) {
-			this.mWaiteTime.string = "现在可以出售资产";
-			this.mSaleTx.string = "出售资产"
+			this.mWaiteTime.string = "现在可以出售产业";
+			this.mSaleTx.string = "出售产业"
 			this.isCanSure = true;
 		} else {
 			var left = time123 - this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).time -
 				this.mGame.mUserInfo.mapInfo.get(this.mGame.mUserInfo.current_map).salecd * 60 * 60 * 1000;
 			if (left > 0) {
-				this.mWaiteTime.string = "现在可以出售资产";
-				this.mSaleTx.string = "出售资产";
+				this.mWaiteTime.string = "现在可以出售产业";
+				this.mSaleTx.string = "出售产业";
 				this.isCanSure = true;
 			} else {
 				this.isCanSure = false;
@@ -165,15 +165,15 @@ export default class NewClass extends cc.Component {
 				var afterMin = left - min * 60;//取得算出分后剩余的秒数
 				console.log("salezichang afterMin =  " + afterMin);
 				if (day == 0 && hour == 0 && min == 0 && afterMin == 0) {
-					this.mWaiteTime.string = "现在可以出售资产";
-					this.mSaleTx.string = "出售资产";
+					this.mWaiteTime.string = "现在可以出售产业";
+					this.mSaleTx.string = "出售产业";
 					this.isCanSure = false;
 				
 				} else {
 					var h = day * 24 + hour;
 					this.mWaiteTime.string = "" + (h == 0 ? "" : (h + "h")) +
 						(min == 0 ? (h == 0 ? "" : "00m") : (min < 10 ? ("0" + min + "m") : (min + "m"))) + (afterMin == 0 ? ("00s") : (afterMin < 10 ? ("0" + afterMin + "s") : (afterMin + "s"))) +
-						"之后可以出售资产\n你也可以立即出售";
+						"之后可以出售产业\n你也可以立即出售";
 					this.mSaleTx.string = "立即出售";
 				}
 			}
