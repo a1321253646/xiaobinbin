@@ -166,14 +166,16 @@ export default class HttpUtil {
 					console.log("post user =" + user);
 					console.log("post target.usrId =" + target.usrId);
 					//>>>>>>>>>>>>>>>>>>>>>>н╒пе
-	/*
-					if (user != target.usrId) {
-						console.log(" user !=target.usrId");
-						wx.setStorage({
-							key: "userId",
-							data: user
-						})
-					}*/
+					if (GameControl.isWeixin) {
+						if (user != target.usrId) {
+							console.log(" user !=target.usrId");
+							wx.setStorage({
+								key: "userId",
+								data: user
+							})
+						}
+					}
+
 					//<<<<<<<<<<<<<<<<<<<<<<<н╒пе
 					target.usrId = user;
 					console.log("post param1 =" + param2);
@@ -217,6 +219,7 @@ export default class HttpUtil {
 								map.icon = data2[i]["icon"];
 								map.bg = data2[i]["bg"];
 								map.builde_id = data2[i]["builde_id"];
+								map.open_id = data2[i]["open_id"];
 								userInfo.mapInfo.set(map.id, map);
 							}
 						}
@@ -255,7 +258,7 @@ export default class HttpUtil {
 										cl.level = data6[iii]["level"];
 										cl.level_up_cost = Number(data6[iii]["level_up_cost"]);
 										cl.creatBase = Number(data6[iii]["creat_base"]);
-										cl.icon = current.icon;
+										cl.icon = data6[iii]["resource"];
 										cl.skill = 0;
 										cl.param = 0;
 										levelMap.set(cl.level, cl);

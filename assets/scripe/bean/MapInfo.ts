@@ -9,4 +9,5 @@ export default class MapInfo {
 	icon = "default";
 	bg = "default";
 	builde_id = "";
+	open_id = 0;
 }

@@ -236,27 +236,24 @@ export default class NewClass extends cc.Component {
 		if (game.levelUpCount < count) {
 			count = game.levelUpCount;
 		}
+		var coatShow = 0;
 		for (var i = 0; i < count; i++) {
 			if (this.mBean.level + i >= this.mMax) {
 				break;
 			}
 			coat += game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost;
+			coatShow += game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost;
+			
 			if (game.levelUpCount > 100 && coat > game.getAllMoney()) {
 				if (coat != game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost) {
 					coat -= game.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level + i).level_up_cost;
 				}
-				break;
+			//	break;
 			}
 		}
+		this.cost.string = NumberToString.numberToString(coatShow);
 		console.log("coat  =" + coat + " game.mUserInfo.money=" + game.mUserInfo.money);
 		this.mCost = coat;
-		this.cost.string = NumberToString.numberToString(coat);
-	}
-	guide(index: number) {
-		if (index == 4) {
-			this.mGame.mGuideControl.show(this.node.parent.getPosition().x + this.node.getPosition().x + this.icon.node.getPosition().x,
-				this.node.parent.getPosition().y + this.node.getPosition().y + this.icon.node.getPosition().y,
-				this.icon.node.getContentSize().width, this.icon.node.getContentSize().height, "升级第一个建筑", 1);
-		}
+		
 	}
 }

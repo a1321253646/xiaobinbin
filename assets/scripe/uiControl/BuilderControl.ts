@@ -72,11 +72,11 @@ export default class NewClass extends cc.Component {
 		if (isInitUi) {
 		
 			this.mUi.init(this.mId, this.mGame);
-			this.mIcon.setState(0);
+		//	this.mIcon.setState(0);
 			//this.mUi.node.setScale(1, 1);
 		} else {
 			this.mUi.unInit(this.mId, this.mGame);
-			this.mIcon.setState(1);
+		//	this.mIcon.setState(1);
 			//this.mUi.node.setScale(0, 0);
 		}
 		
@@ -138,8 +138,28 @@ export default class NewClass extends cc.Component {
 	}
 
 	enableBuilder() {
+		this.showLoading();
 		this.mBean = this.mGame.mUserInfo.mapBuilderStatus.get(this.mId);
-		this.mIcon.setState(0);
+
+		var icon = this.mGame.mUserInfo.mapBuilderLevelInfo.get(this.mId).get(this.mBean.level).icon;
+		console.log("showLoaded icon=" + icon);
+		var info = this.mGame.mUserInfo.mapBuilderInfo.get(icon);
+		console.log("showLoaded info.icon=" + info.icon);
+		var self = this;
+		cc.loader.load("http://120.79.249.55/images/jianzhu/" + info.icon + ".png", function (err, texture) {
+			var sprite = new cc.SpriteFrame(texture);
+			self.mIcon.spriteFrame = sprite;
+			console.log(" info.icon = " + info.icon);
+			self.mUi.showLoaded();
+		});
+		console.log(" info.icon = " + info.icon);
+		var x = Number(info.position.split(",")[0]);
+		var y = Number(info.position.split(",")[1]);
+		this.node.setPosition(new cc.Vec2(x, y));
+
+		var w = Number(info.size.split(",")[0]);
+		var l = Number(info.size.split(",")[1]);
+		this.node.setContentSize(w, l);
 
 		this.mUi.init(this.mBean.id, this.mGame);
 

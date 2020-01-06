@@ -96,6 +96,9 @@ export default class GameControl extends cc.Component {
 	@property(GuideControl)
 	mGuideControl: GuideControl = null;
 
+	@property(cc.Label)
+	mSaleTip: cc.Label = null;
+
 	mEanMoney = 0;
 
 	public mUserInfo: UserDateBean;
@@ -103,7 +106,11 @@ export default class GameControl extends cc.Component {
 	public isInited = false;
 	public isShowlevel = false;
 
+	public static isWeixin = true;
+
 	levelUpCount = 1;
+	usrId = "default";
+
 	start() {
 
 		var windowSize = cc.view.getFrameSize();
@@ -119,127 +126,141 @@ export default class GameControl extends cc.Component {
 			this.mCanvas.fitWidth = false;
 		}
 
+		if (GameControl.isWeixin) {
+			this.usrId = "default";
+		} else {
+			this.usrId = "xXC5RbZkP17";
+		}
 
+		
 
 		//>>>>>>>>>>>>>>>>>>>>>>微信
-		/*let sysInfo = window.wx.getSystemInfoSync();
-		console.log("sysInfo.screenWidth=" + sysInfo.screenWidth);
-		console.log("sysInfo.screenHeight=" + sysInfo.screenHeight);
+		if (GameControl.isWeixin) {
+			let sysInfo = window.wx.getSystemInfoSync();
+			console.log("sysInfo.screenWidth=" + sysInfo.screenWidth);
+			console.log("sysInfo.screenHeight=" + sysInfo.screenHeight);
 
-		var self = this;
-		wx.login({
-			success: function (r) {
-				console.log('login success')
-				var code = r.code;//登录凭证
-				if (code) {
-					wx.getSetting({
-						success(res) {
-							if (!res.authSetting['scope.userInfo']) {
-								console.log("!res.authSetting['scope.userInfo']");
-								//self.getUserInfo(self.usrId);
-								try {
-									var value = wx.getStorageSync('userId')
-									if (value) {
-										console.log("wx.getStrage = " + value);
-										self.usrId = value;
-										self.getUserInfo(self.usrId);
-									} else {
-										console.log("wx.getStrage = null");
-										self.getUserInfo(self.usrId);
+			var self = this;
+			wx.login({
+				success: function (r) {
+					console.log('login success')
+					var code = r.code;//登录凭证
+					if (code) {
+						wx.getSetting({
+							success(res) {
+								if (!res.authSetting['scope.userInfo']) {
+									console.log("!res.authSetting['scope.userInfo']");
+									//self.getUserInfo(self.usrId);
+									try {
+										var value = wx.getStorageSync('userId')
+										if (value) {
+											console.log("wx.getStrage = " + value);
+											self.usrId = value;
+											self.getUserInfo(self.usrId);
+										} else {
+											console.log("wx.getStrage = null");
+											self.getUserInfo(self.usrId);
+										}
+									} catch (e) {
+										console.log("wx.getStrage error= " + e);
 									}
-								} catch (e) {
-									console.log("wx.getStrage error= " + e);
+
+
+
+									let button = window.wx.createUserInfoButton({
+										type: 'text',
+										text: ' ',
+										style: {
+											left: 0,
+											top: 0,
+											width: sysInfo.screenWidth,
+											height: sysInfo.screenHeight,
+											backgroundColor: '#00000000',//最后两位为透明度
+											color: '#ffffff',
+											fontSize: 20,
+											textAlign: "center",
+											lineHeight: sysInfo.screenHeight,
+										}
+									});
+									console.log("createUserInfoButton");
+									button.onTap((res) => {
+										console.log("button.onTap", res);
+										if (res.userInfo) {
+											console.log("res.userInfo:", res);
+											wx.getUserInfo({
+												success: function (res) {
+													console.log({ encryptedData: res.encryptedData, iv: res.iv, code: code })
+													//3.请求自己的服务器，解密用户信息 获取unionId等加密信息
+													var user = new RequiteWxUserInfo();
+													user.encryptedData = res.encryptedData;
+													user.iv = res.iv;
+													user.code = code;
+													HttpUtil.postGetUserInfo("wx", user, self, false);
+
+												},
+												fail: function () {
+													console.log('获取用户信息失败')
+												}
+											})
+											button.destroy();
+										} else {
+											console.log("!res.userInfo:", res);
+										}
+
+									});
+									console.log("button.show();");
+									button.show();
+								} else {
+									console.log("res.authSetting['scope.userInfo']");
+									wx.getUserInfo({
+										success: function (res) {
+											console.log({ encryptedData: res.encryptedData, iv: res.iv, code: code })
+											//3.请求自己的服务器，解密用户信息 获取unionId等加密信息
+											var user = new RequiteWxUserInfo();
+											user.encryptedData = res.encryptedData;
+											user.iv = res.iv;
+											user.code = code;
+											HttpUtil.postGetUserInfo("wx", user, self, true);
+										},
+										fail: function () {
+											console.log('获取用户信息失败')
+										}
+									})
 								}
-
-
-
-								let button = window.wx.createUserInfoButton({
-									type: 'text',
-									text: ' ',
-									style: {
-										left: 0,
-										top: 0,
-										width: sysInfo.screenWidth,
-										height: sysInfo.screenHeight,
-										backgroundColor: '#00000000',//最后两位为透明度
-										color: '#ffffff',
-										fontSize: 20,
-										textAlign: "center",
-										lineHeight: sysInfo.screenHeight,
-									}
-								});
-								console.log("createUserInfoButton");
-								button.onTap((res) => {
-									console.log("button.onTap", res);
-									if (res.userInfo) {
-										console.log("res.userInfo:", res);
-										wx.getUserInfo({
-											success: function (res) {
-												console.log({ encryptedData: res.encryptedData, iv: res.iv, code: code })
-												//3.请求自己的服务器，解密用户信息 获取unionId等加密信息
-												var user = new RequiteWxUserInfo();
-												user.encryptedData = res.encryptedData;
-												user.iv = res.iv;
-												user.code = code;
-												HttpUtil.postGetUserInfo("wx", user, self,false);
-
-											},
-											fail: function () {
-												console.log('获取用户信息失败')
-											}
-										})
-										button.destroy();
-									} else {
-										console.log("!res.userInfo:", res);
-									}
-									
-								});
-								console.log("button.show();");
-								button.show();				
-							} else {
-								console.log("res.authSetting['scope.userInfo']");
-								wx.getUserInfo({
-									success: function (res) {
-										console.log({ encryptedData: res.encryptedData, iv: res.iv, code: code })
-										//3.请求自己的服务器，解密用户信息 获取unionId等加密信息
-										var user = new RequiteWxUserInfo();
-										user.encryptedData = res.encryptedData;
-										user.iv = res.iv;
-										user.code = code;
-										HttpUtil.postGetUserInfo("wx", user, self,true);
-									},
-									fail: function () {
-										console.log('获取用户信息失败')
-									}
-								})
 							}
-						}
-					})
+						})
+					}
+				},
+				fail: function () {
+					console.log('login fail')
 				}
-			},
-			fail: function () {
-				console.log('login fail')
-			}
-		})
-		wx.onShow(function (res) {
-			console.log("weixin onShow");
-			if (!self.isAppShow) {
-				self.showChange();
-				
-				self.reStart();
-			}
-			self.isAppShow = true;
-		})
+			})
+			wx.onShow(function (res) {
+				console.log("weixin onShow");
+				if (!self.isAppShow) {
+					self.showChange();
 
-		wx.onHide(function (res) {
-			console.log("weixin onHide");
-			self.isAppShow = false;
-			self.showChange();
-		})*/
+					self.reStart();
+				}
+				self.isAppShow = true;
+			})
+
+			wx.onHide(function (res) {
+				console.log("weixin onHide");
+				self.isAppShow = false;
+				self.showChange();
+			})
+
+		}
+
+		
 		//<<<<<<<<<<<<<<<<<<<<<<<微信
 		this.mBg1.node.on(cc.Node.EventType.TOUCH_START, this.back2Click, this);
 		//>>>>>>>>>>>>>>>>>>>>>>>>>cocos
-		this.getUserInfo(this.usrId);
+		if (!GameControl.isWeixin) {
+			this.getUserInfo(this.usrId);
+		}
+
 		//<<<<<<<<<<<<<<<<<<<<<<<cocos
 
 	}
@@ -249,10 +270,10 @@ export default class GameControl extends cc.Component {
 		this.node.getComponentInChildren(OtherSettingControl).disShow();
 	}
 	//>>>>>>>>>>>>>>>>>>>>>>微信
-	//usrId = "default";
+	
 	//<<<<<<<<<<<<<<<<<<<<<<<微信
 	//>>>>>>>>>>>>>>>>>>>>>>>>>cocos
-	usrId = "xXC5RbZkP";
+	//
 	//<<<<<<<<<<<<<<<<<<<<<<<cocos
 	getUserInfo(user2: string) {
 		this.usrId = user2;
@@ -295,6 +316,14 @@ export default class GameControl extends cc.Component {
 			}
 			
 
+		}
+
+		if (this.isSaleTipControlShow) {
+			this.saleTipTime += dt;
+			if (this.saleTipTime > 2) {
+				this.mSaleTip.node.parent.setScale(0);
+				this.isSaleTipControlShow = false;
+			}
 		}
 
 		if (!this.isInited) {
@@ -341,7 +370,7 @@ export default class GameControl extends cc.Component {
 
 		this.node.getComponentInChildren(BuilderListControl).init(this);
 		console.log(" builderInit  ");
-		this.mZuanshi.string = NumberToString.numberToString(this.mUserInfo.zuanshi);
+		this.mZuanshi.string ="0";
 		this.aZichang.string = NumberToString.numberToString(this.mUserInfo.zichang);
 		this.changeAllMoneyCount();
 		this.getEachMoney();
@@ -352,6 +381,7 @@ export default class GameControl extends cc.Component {
 		if (this.mGuideControl.nGuideIndex == 0) {
 			this.mOutLineControl.show(this);
 		}
+		this.removeAll();
 		
 	}
 
@@ -417,7 +447,7 @@ export default class GameControl extends cc.Component {
 		req.builderInfo = req2;
 		HttpUtil.buy("buy", req);
 		this.changeAllMoneyCount();
-		cc.audioEngine.play(this.mLevelUpSource, false,0.5);
+	//	cc.audioEngine.play(this.mLevelUpSource, false,0.5);
 
 	}
 
@@ -545,8 +575,24 @@ export default class GameControl extends cc.Component {
 			
 		}
 	}
+	isSaleTipControlShow = false;
+	saleTipTime = 0;
 	showSale() {
-		this.node.getComponentInChildren(SaleControl).show();
+		var open = this.mUserInfo.mapInfo.get(this.mUserInfo.current_map).open_id;
+		console.log("showSale open   = " + open);
+		if (this.mUserInfo.mapBuilderStatus.get(open) != null) {
+			this.node.getComponentInChildren(SaleControl).show();
+		} else {
+			var str = this.mUserInfo.mString.get(1000028);
+			console.log("showSale str   = " + str);
+			str = str.replace("&n1", this.mUserInfo.mString.get(this.mUserInfo.mapBuilderInfo.get(this.mUserInfo.mapBuilderLevelInfo.get(open).get(0).icon).name));
+			console.log("showSale str   = " + str);
+			this.mSaleTip.string = str;
+			this.mSaleTip.node.parent.setScale(1);
+			this.isSaleTipControlShow = true;
+			this.saleTipTime = 0;
+		}
+		
 	}
 
 	buy(bean: ShopItemInfoBean): boolean{
@@ -762,6 +808,34 @@ export default class GameControl extends cc.Component {
 		coin.node.setPosition(x, y+45.5);
 		coin.init(count);
 	}
+	flyCountTxStr(x: number, y: number, str: string) {
+		var coin: FlyTextControl;
+		if (this.mFlyTextList.length == 0) {
+			var loadobj = cc.instantiate(this.mFlyText);
+			cc.find("Canvas/Main Camera/builderUi").addChild(loadobj);
+			coin = loadobj.getComponent(FlyTextControl);
+			this.mFlyTextList.push(coin);
+		}
+		if (coin == null) {
+			for (var i = 0; i < this.mFlyTextList.length; i++) {
+				console.log(" this.mFlyTextList.length =" + this.mFlyTextList.length);
+				console.log("i =" + i);
+				console.log("this.mFlyTextList[i] =" + this.mFlyTextList[i]);
+				if (!this.mFlyTextList[i].isInit) {
+					coin = this.mFlyTextList[i];
+					break;
+				}
+			}
+			if (coin == null) {
+				var loadobj2 = cc.instantiate(this.mFlyText);
+				cc.find("Canvas/Main Camera/builderUi").addChild(loadobj2);
+				coin = loadobj2.getComponent(FlyTextControl);
+				this.mFlyTextList.push(coin);
+			}
+		}
+		coin.node.setPosition(x, y + 45.5);
+		coin.initStr(str);
+	}
 	testAddZichang() {
 /*		this.mUserInfo.zichang += 100;
 		this.aZichang.string = this.mUserInfo.zichang + "";
@@ -791,5 +865,32 @@ export default class GameControl extends cc.Component {
 		else if (index == 4) {
 			this.node.getComponentInChildren(BuilderListControl).guide(3);
 		}
+	}
+
+	removeAll() {
+		console.log("  guide removeAll");
+
+
+		cc.find("Canvas/Main Camera/gameUi/mapChange").setScale(0);
+		cc.find("Canvas/Main Camera/gameUi/fuli").setScale(0);
+		cc.find("Canvas/Main Camera/gameUi/friend").setScale(0);
+		cc.find("Canvas/Main Camera/gameUi/friendHelp").setScale(0);
+		cc.find("Canvas/Main Camera/gameUi/other").setScale(0);
+		cc.find("Canvas/Main Camera/gameUi/levelShow").setScale(0);
+		cc.find("Canvas/Main Camera/gameUi/shopButton").setScale(0);
+		cc.find("Canvas/Main Camera/gameUi/sale_all").setScale(0);
+		cc.find("Canvas/Main Camera/gameUi/box").setScale(0);
+	}
+	showAll() {
+		console.log("  guide showAll");
+		cc.find("Canvas/Main Camera/gameUi/levelShow").setScale(1);
+		cc.find("Canvas/Main Camera/gameUi/shopButton").setScale(1);
+		cc.find("Canvas/Main Camera/gameUi/sale_all").setScale(1);
+		cc.find("Canvas/Main Camera/gameUi/box").setScale(1);
+		cc.find("Canvas/Main Camera/gameUi/mapChange").setScale(1);
+		cc.find("Canvas/Main Camera/gameUi/fuli").setScale(1);
+		cc.find("Canvas/Main Camera/gameUi/friend").setScale(1);
+		cc.find("Canvas/Main Camera/gameUi/friendHelp").setScale(1);
+		cc.find("Canvas/Main Camera/gameUi/other").setScale(1);
 	}
 }

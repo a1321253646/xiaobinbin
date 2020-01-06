@@ -1,5 +1,6 @@
 const { ccclass, property } = cc._decorator;
 import BuilderCoinControl from './BuilderCoinControl';
+import TouchLayoutControl from './TouchLayoutControl';
 @ccclass
 export default class NewClass extends cc.Component {
 
@@ -8,6 +9,7 @@ export default class NewClass extends cc.Component {
 	idDonw = false;
 	mTime = 0;
 	isShow = false;
+	mTouch: TouchLayoutControl;
 
 	update(dt) {
 
@@ -76,6 +78,7 @@ export default class NewClass extends cc.Component {
 		cc.director.getCollisionManager().enabled = true;
 	//	this.mCollider.enabled = false;
 		//cc.director.getCollisionManager().enabledDebugDraw = true;
+		this.mTouch = cc.find("Canvas/Main Camera/touchLayout").getComponent(TouchLayoutControl);
 	}
 
 	show() {
@@ -104,10 +107,10 @@ export default class NewClass extends cc.Component {
 	isCollisionStatus = -1;
 	isCollisionIngTime = 0;
 	onCollisionEnter(other, self) {
-		console.log('on collision onCollisionEnter');
-		this.mUiControl.gainMoney();
-		
-		
+		if (this.mTouch.objectClickObjec()) {
+			console.log('on collision onCollisionEnter');
+			this.mUiControl.gainMoney();
+		}
 	}
 	onCollisionExit(other, self) {
 

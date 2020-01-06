@@ -1,6 +1,7 @@
 ﻿import GameControl from "./GameControl";
 import BuilderListControl from "./BuilderListControl";
 import ShopControl from "./ShopControl";
+import PointControl from "./PointControl";
 import RequiteBuy from "../bean/RequiteBuy";
 import HttpUtil from "../ultis/HttpUtil";
 
@@ -11,20 +12,15 @@ const {ccclass, property} = cc._decorator;
 export default class NewClass extends cc.Component {
 	@property(cc.Node)
 	mAll: cc.Node = null;
-	@property(cc.Node)
-	mUp: cc.Node = null;
-	@property(cc.Node)
-	mDown: cc.Node = null;
-	@property(cc.Node)
-	mLeft: cc.Node = null;
-	@property(cc.Node)
-	mRight: cc.Node = null;
+	
 	@property(cc.Node)
 	mText: cc.Node = null;
 	@property(cc.RichText)
 	mStr: cc.RichText = null;
 	@property(cc.Node)
 	mGuideEnd: cc.Node = null;
+	@property(cc.Node)
+	mPointRoot: cc.Node = null;
 	@property(cc.Sprite)
 	mPoint: cc.Sprite = null;
 	@property(cc.Label)
@@ -37,29 +33,12 @@ export default class NewClass extends cc.Component {
 	nGuideIndex = 0;
 
 
-	show(x: number, y: number, w: number, h: number, text: string, type: number, point: number) {//type:1234 上下左右 5678 左上 右上 左下 右下 point:1 右下角2 上3下4右
+	show(x: number, y: number, w: number, h: number, text: string, type: number, point: number) {//type:1234 上下左右 5678 左上 右上 左下 右下 point:1 右下角2 上3下4右 0为不显示
 		this.mGame.mOutLineControl.close();
 
-		if (h != 0 && w != 0) {
-			this.mUp.setContentSize(720, 1280 / 2 - (y + h / 2));
-			this.mDown.setContentSize(720, 1280 / 2 + (y - h / 2));
-			this.mLeft.setContentSize(720 / 2 + (x - w / 2), h);
-			this.mRight.setContentSize(720 / 2 - (x + w / 2), h);
+		this.mText.setScale(1);
 
-			this.mUp.setPosition(0, y + h / 2);
-			this.mDown.setPosition(0, y - h / 2);
-			this.mLeft.setPosition(x - w / 2, y);
-			this.mRight.setPosition(x + w / 2, y);
-
-
-		} else {
-			this.mUp.setContentSize(0, 0);
-			this.mDown.setContentSize(0, 0);
-			this.mLeft.setContentSize(0 , 0);
-			this.mRight.setContentSize(0, 0);
-		}
-
-		if (type != 0) {
+		if (type > 0) {
 			if (type == 1) {
 				this.mText.setPosition(x, y + h / 2 + this.mText.getContentSize().height / 2);
 			}
@@ -91,26 +70,20 @@ export default class NewClass extends cc.Component {
 
 				this.mText.setPosition(x + w / 2 + this.mText.getContentSize().width / 2, y - h / 2 - this.mText.getContentSize().height / 2);
 			}
-		} else {
+			this.mText.setScale(1);
+		} else if (type == 0){
 			this.mText.setPosition(-67, 297);
+			this.mText.setScale(1);
+		} else if (type == -1) {
+			this.mText.setScale(0);
 		}
 
 		if (point == 0) {
-			this.mPoint.node.setScale(0);
+			this.mPointRoot.setScale(0);
 		} else {
+			this.mPointRoot.getComponent(PointControl).click();
 			this.mPoint.node.setScale(1);
-			if (point == 1) {
-				this.mPoint.node.setPosition(x + w / 2 + this.mPoint.node.getContentSize().width / 2, y - h / 2 - this.mPoint.node.getContentSize().height / 2);
-			}
-			else if (point == 2) {
-				this.mPoint.node.setPosition(x, y + h / 2 + this.mPoint.node.getContentSize().height / 2);
-			}
-			else if (point == 3) {
-				this.mPoint.node.setPosition(x, y - h / 2 -  -  this.mPoint.node.getContentSize().height/ 2);
-			}
-			else if (point == 4) {
-				this.mPoint.node.setPosition(x + w / 2 + this.mPoint.node.getContentSize().width / 2, y);
-			}
+			this.mPointRoot.setPosition(x , y);
 		}
 
 		this.mStr.string = text;
@@ -134,8 +107,11 @@ export default class NewClass extends cc.Component {
 		if (!this.isInit) {
 			return;
 		}
+
 		if (this.mGame.mUserInfo.current_map != 10001 || this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).time > 0) {
 			this.isInit = false;
+			this.disShow();
+			return;
 		}
 		if (this.isShow) {
 			if (this.nGuideIndex == 1 && this.mGame.mUserInfo.mapBuilderStatus != null && this.mGame.mUserInfo.mapBuilderStatus.size == 1 &&
@@ -145,6 +121,7 @@ export default class NewClass extends cc.Component {
 
 			}
 			else if (this.nGuideIndex == 2 && this.mGame.mUserInfo.money >= 10) {
+				
 				this.disShow();
 
 			}
@@ -207,6 +184,9 @@ export default class NewClass extends cc.Component {
 				return;
 			}
 		}
+		cc.find("Canvas/Main Camera/gameUi/levelShow").setScale(1);
+		cc.find("Canvas/Main Camera/gameUi/box").setScale(0);
+		cc.find("Canvas/Main Camera/gameUi/shopButton").setScale(0);
 		if (this.nGuideIndex < 3) {
 			if (this.mGame.mUserInfo.mapBuilderStatus != null && this.mGame.mUserInfo.mapBuilderStatus.size == 1 &&
 				this.mGame.mUserInfo.mapBuilderStatus.get(10001) != null && this.mGame.mUserInfo.mapBuilderStatus.get(10001).level < 5) {
@@ -271,12 +251,26 @@ export default class NewClass extends cc.Component {
 			if (this.mGame.mUserInfo.mapBuilderStatus != null && this.mGame.mUserInfo.mapBuilderStatus.size == 2 &&
 				this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).buy != null &&
 				!this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).buy.match("110001") && this.mGame.mUserInfo.money < 300) {
-				this.show(0, 0, 0, 0, this.mGame.mUserInfo.mString.get(1000023), 0,0);
+				this.show(0, 0, 0, 0, this.mGame.mUserInfo.mString.get(1000023), 0, 19);
+
+				var builder111 = this.mGame.node.getComponentInChildren(BuilderListControl).mControlList.get(10001);
+				var coin111 = builder111.mUi.mCoinControl;
+				var x1 = coin111.node.parent.getPosition().x + coin111.node.getPosition().x + coin111.coinIcon.node.getPosition().x;
+				var y1 = coin111.node.parent.getPosition().y + coin111.node.getPosition().y + coin111.coinIcon.node.getPosition().y;
+
+				var builder112 = this.mGame.node.getComponentInChildren(BuilderListControl).mControlList.get(10002);
+				var coin112 = builder112.mUi.mCoinControl;
+				var x2 = coin112.node.parent.getPosition().x + coin112.node.getPosition().x + coin112.coinIcon.node.getPosition().x;
+				var y2 = coin112.node.parent.getPosition().y + coin112.node.getPosition().y + coin112.coinIcon.node.getPosition().y;
+
+
+				this.mPointRoot.getComponent(PointControl).move(x1, y1, x2, y2);
 				this.nGuideIndex = 11;
 
 				return;
 			}
 		}
+		cc.find("Canvas/Main Camera/gameUi/shopButton").setScale(1);
 		if (this.nGuideIndex < 12) {
 			if (this.mGame.mUserInfo.mapBuilderStatus != null && this.mGame.mUserInfo.mapBuilderStatus.size == 2 &&
 				(this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).buy == null ||
@@ -291,7 +285,7 @@ export default class NewClass extends cc.Component {
 			if (this.mGame.mUserInfo.mapBuilderStatus != null && this.mGame.mUserInfo.mapBuilderStatus.size == 2 &&
 				(this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).buy == null  ||
 				!this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).buy.match("110001") )&& this.mGame.mUserInfo.money >= 300 && this.mGame.isShowShop) {
-				this.show(-147, 100, 205, 70, this.mGame.mUserInfo.mString.get(1000024), 0, 1);
+				this.show(-147, 100, 205, 70, this.mGame.mUserInfo.mString.get(1000024), -1, 1);
 				
 				this.nGuideIndex = 13;
 				
@@ -305,6 +299,7 @@ export default class NewClass extends cc.Component {
 			this.mTip.node.setScale(1);
 			this.mGame.mUserInfo.zichang = 100;
 			this.mGame.mUserInfo.money += 10000;
+			this.mGame.mUserInfo.mHaveMap.get(this.mGame.mUserInfo.current_map).creat += 10000;
 			this.mGame.aZichang.string = this.mGame.mUserInfo.zichang + "";
 			this.mGame.allMeney.string = this.mGame.mUserInfo.money + "";
 			this.mGame.node.getComponentInChildren(BuilderListControl).updateValue();
@@ -324,6 +319,7 @@ export default class NewClass extends cc.Component {
 			HttpUtil.buy("buy", req);
 			return;
 		}
+		this.mGame.showAll();
 		this.isInit = false;
 	}
 	click() {

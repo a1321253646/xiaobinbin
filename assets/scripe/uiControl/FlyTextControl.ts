@@ -23,6 +23,14 @@ export default class NewClass extends cc.Component {
 
 		this.isInit = true;
 	} 
+	initStr(str: string) {
+		this.mText.string = str;
+		this.mFlyTime = 0;
+		this.node.setScale(1);
+
+		this.isInit = true;
+	}
+
 	update(dt) {
 		if (!this.isInit) {
 			return;
