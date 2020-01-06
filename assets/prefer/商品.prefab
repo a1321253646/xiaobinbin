@@ -254,9 +254,15 @@
       "__id__": 5
     },
     "_enabled": true,
+<<<<<<< HEAD
+    "_spriteFrame": {
+      "__uuid__": "73fb4816-4a70-47c2-8628-124320c3c6c3"
+    },
+=======
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": null,
+>>>>>>> 5e7b771335e7868f504a3a4c292a771ad6dcd3cd
     "_type": 0,
     "_sizeMode": 0,
     "_fillType": 0,
@@ -357,8 +363,8 @@
     },
     "_enabled": true,
     "_useOriginalSize": false,
-    "_string": "获得金币X3",
-    "_N$string": "获得金币X3",
+    "_string": "获得金币X3\n获得金币X3",
+    "_N$string": "获得金币X3\n获得金币X3",
     "_fontSize": 24,
     "_lineHeight": 30,
     "_enableWrapText": true,
